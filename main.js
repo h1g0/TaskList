@@ -8,9 +8,11 @@ Vue.directive('visible', function(el, binding) {
 });
 
 Vue.component('task-item', {
-    props: ['task'],
+    props: ['task','index','totalsize'],
     template: `
-      <li class = "task-item" :id = "task.id">
+      <li class = "task-item" :id = "task.id" style="margin-left:20px">
+      <input type = "checkbox" v-model="task.checked" />
+      <input type="text" v-model = "task.text" title = "内容" />
       </li>
       `,
 });
@@ -19,7 +21,7 @@ var vm = new Vue({
     el: "#main",
     data: {
         taskList: [
-        {id: buildId(), depth: 0, text: ''}
+        {id: buildId(), depth: 0, checked: false, text: ''}
         ],
         outputStr: '',
         outputTemplate: {
@@ -31,7 +33,6 @@ var vm = new Vue({
         },
         settings: {
             showSettings: false,
-        }
+        },
     },
-
 });

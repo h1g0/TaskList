@@ -1,3 +1,19 @@
+.v-enter-active, .v-leave-active, .v-move {
+    animation-timing-function: ease;
+    transition: opacity 0.3s, transform 0.3s;
+}
+.v-leave-active {
+    position: absolute;
+}
+.v-enter {
+    opacity: 0;
+    transform: translateX(-64px);
+}
+.v-leave-to {
+    opacity: 0;
+    transform: translateX(64px);
+}
+
 h1 {
     font-size: 16px;
     padding: 0.3em 0.3em;

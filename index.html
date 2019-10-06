@@ -10,8 +10,22 @@
     <body>
         <div id = "page">
             <h1>TODO</h1>
+            <div id = "main">
+            <ul>
+            <transition-group>
+                <task-item
+                v-for="(item,index) in taskList"
+                v-bind:task="item"
+                v-bind:index="index"
+                v-bind:totalsize="taskList.length"
+                v-bind:key="item.id"
+                :ref="index"
+                ></task-item>
+            </transition-group>
+            </ul>
+            </div>
             
         </div>
-    <script src="main.js"></script>
+        <script src="main.js"></script>
     </body>
 </html>
