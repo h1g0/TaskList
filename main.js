@@ -14,11 +14,11 @@ function buildNewItem() {
 Vue.component('task-item', {
     props: ['task','index','totalsize'],
     template: `
-      <div class = "task-item" :id = "task.id" v-bind:style="{marginLeft: task.indent * 20 + 'px'}">
+      <div class = "task-item" :id = "task.id" v-bind:style="{marginLeft: task.indent * 20 + 'px'}" @mouseenter="$emit('show-item-buttons')" @mouseleave="$emit('hide-item-buttons')">
       <input type = "checkbox" v-model="task.checked" @change="$emit('save-item')" />
       <div v-show=" ! isEditing" @click="$emit('show-edit-item-text')" v-bind:style="{display:'inline-block', width:500 - task.indent * 20  + 'px', height:'1em', textDecoration: (task.checked)?'line-through':'none'}"> {{ task.text }}</div>
       <input type="text" ref="input" v-model = "task.text" v-show="isEditing" @change="$emit('save-item')" @blur="$emit('hide-edit-item-text')" v-bind:style="{display:'inline-block', width:500 - task.indent * 20  + 'px', height:'1em', textDecoration: (task.checked)?'line-through':'none'}" title = "内容" />
-      <div  v-bind:style="{display:'inline-block'}">
+      <div v-show="isShowItemButtons" v-bind:style="{display:'inline-block'}">
       <input type = "button" @click="$emit('add-item')" class="menu" value= "➕" title ="下に項目を追加" />
       <input type = "button" @click="$emit('move-item-to-left')" class="menu" value= "◀" title = "インデントを戻す" v-visible="task.indent" />
       <input type = "button" @click="$emit('move-item-to-right')" class="menu" value= "▶" title = "インデント" />
@@ -35,6 +35,7 @@ Vue.component('task-item', {
             isBottomItem: true,
             isDeletableItem: false,
             isEditing: false,
+            isShowItemButtons: false,
         }
     },
     methods:{
@@ -132,6 +133,12 @@ var vm = new Vue({
         },
         hideEditItemText: function (index) {
             this.$refs[index]['0'].isEditing = false;
+        },
+        showItemButtons: function (index) {
+            this.$refs[index]['0'].isShowItemButtons = true;
+        },
+        hideItemButtons: function (index) {
+            this.$refs[index]['0'].isShowItemButtons = false;
         },
         saveItem: function(){
             localStorage.taskList = JSON.stringify(this.taskList);
