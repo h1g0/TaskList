@@ -275,7 +275,7 @@ body{
 .tasks{
   padding-top: 120px;
   margin-bottom: 60px;
-  font-size: 120%;
+  /*font-size: 120%;*/
 }
 .result{
   width:100%;
