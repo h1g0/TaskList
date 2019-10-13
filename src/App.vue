@@ -1,6 +1,11 @@
 <template>
   <div id="app">
-    <h1>TODO</h1>
+    <div class="header">
+      <h1>TODO</h1>
+    </div>
+
+    <div class="main-content">
+      <div class="tasks">
     <draggable
       v-model="taskList"
       v-bind="dragOptions"
@@ -30,6 +35,15 @@
       ></task-item>
       </transition-group>
     </draggable>
+    </div>
+    <div class="output">
+      <input type="button" value="出力" class="menu" @click="outputResult" />
+      <input type="button" value="コピー" class="menu" @click="copyResult" />
+      <br />
+      <textarea class="result" v-bind:value="outputStr"></textarea>
+    </div>
+    </div>
+
   </div>
 </template>
 
@@ -48,14 +62,15 @@ export default {
     return {
       taskList: [this.buildNewItem()],
       outputStr: "",
-      outputTemplate: {
+      taskListOutputTemplate: {
         header: "## TODO{br}{br}",
-        body: "- {CheckBoxText} {Text}{br}",
-        footer: "{br}",
+        indentStr: "  ",
+        body: "{IndentText}- {CheckBoxText} {Text}{br}",
+        footer: "",
         uncheckedText: "[ ]",
         checkedText: "[x]"
       },
-      settings: {
+      taskListSettings: {
         showSettings: false
       }
     };
@@ -148,7 +163,34 @@ export default {
     },
     saveItem: function() {
       localStorage.taskList = JSON.stringify(this.taskList);
-    }
+    },
+    replaceOutputStr: function(index, template){
+      let indentStr = "";
+      for(let i = 0; i < this.taskList[index].indent;i++){
+        indentStr += this.taskListOutputTemplate.indentStr;
+      }
+      let checkStr = this.taskList[index].checked ? 
+        this.taskListOutputTemplate.checkedText:
+        this.taskListOutputTemplate.uncheckedText;
+      let lineStr = template
+        .replace(/\{IndentText\}/g, indentStr)
+        .replace(/\{CheckBoxText\}/g, checkStr)
+        .replace(/\{Text\}/g, this.taskList[index].text)
+        .replace(/\{br\}/g, "\n");
+      return lineStr;
+    },
+    outputResult: function(){
+      this.outputStr = this.replaceOutputStr(0, this.taskListOutputTemplate.header);
+      for (let item in this.taskList) {
+        this.outputStr += this.replaceOutputStr(item, this.taskListOutputTemplate.body);
+      }
+      this.outputStr += this.replaceOutputStr(0, this.taskListOutputTemplate.footer);
+    },
+    copyResult: function(){
+      let textarea = document.getElementsByClassName("result")[0];
+      textarea.select();
+      document.execCommand("copy");
+    },
   },
   mounted() {
     if (localStorage.taskList) {
@@ -159,6 +201,7 @@ export default {
     this.$nextTick(function() {
       this.setAllItemState();
     });
+    this.saveItem();
   }
 };
 </script>
@@ -186,15 +229,63 @@ export default {
 }
 .ghost {
   opacity: 0.5;
-  background: #c8ebfb;
+  background: #fdfcf4;
+  box-shadow: 0 0 8px rgba(0,0,0,0.3);
+}
+
+html{
+  height: 100%;
+}
+body{
+  margin:0px;
+  height: 100%;
+  background-color:#414345;
+}
+#app{
+  margin: 0px;
+  padding: 0px;
+  height: 100%;
+  background: linear-gradient(to top, #414345, #232526);
+}
+.header{
+  position: fixed;
+  top: 0;
+  left: 0;
+  box-shadow:0px 0px 10px;
+  z-index: 999;
+  width: 100%;
+  background: linear-gradient(to top, #ece9e6, #ffffff);
+  margin: 0px 0px 0px 0px;
+  padding-left: 30px;
+  height: 60px;
+}
+
+.main-content{
+  position: relative;
+  margin-left: auto;
+  margin-right: auto;
+  z-index: 1;
+  padding: 0px 20px 0px 20px;
+  background-color: #ffffff;
+  box-shadow: -8px 0px 8px 0px rgba(0,0,0,0.3), 8px 0px 8px 0px rgba(0,0,0,0.3);
+  width: 750px;
+  min-height: 100%;
+}
+
+.tasks{
+  padding-top: 120px;
+  margin-bottom: 60px;
+  font-size: 120%;
+}
+.result{
+  width:100%;
+  height:10em;
+  resize: vertical;
 }
 h1 {
-  font-size: 16px;
-  padding: 0.3em 0.3em;
-  color: #494949;
-  background: #f4f4f4;
-  border-left: solid 16px #7db4e6;
-  border-bottom: solid 3px #d7d7d7;
+  font-size: 21px;
+  color: rgba(0,0,0,0.6);
+  text-shadow: 2px 2px 3px rgba(255,255,255,0.1);
 }
 h2 {
   font-size: 16px;
