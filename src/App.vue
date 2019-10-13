@@ -1,7 +1,14 @@
 <template>
   <div id="app">
     <h1>TODO</h1>
-    <draggable v-model="taskList" group="task" @start="drag=true" @end="drag=false">
+    <draggable
+      v-model="taskList"
+      v-bind="dragOptions"
+      group="task"
+      @start="drag=true"
+      @end="drag=false"
+    >
+      <transition-group type="transition">
       <task-item
         v-for="(item,index) in taskList"
         v-bind:task="item"
@@ -21,6 +28,7 @@
         @hide-item-buttons="hideItemButtons(index)"
         @save-item="saveItem()"
       ></task-item>
+      </transition-group>
     </draggable>
   </div>
 </template>
@@ -51,6 +59,16 @@ export default {
         showSettings: false
       }
     };
+  },
+  computed: {
+    dragOptions() {
+      return {
+        animation: 200,
+        group: "task",
+        disabled: false,
+        ghostClass: "ghost"
+      };
+    }
   },
   methods: {
     buildId: function() {
@@ -163,7 +181,13 @@ export default {
   opacity: 0;
   transform: translateX(64px);
 }
-
+.flip-list-move {
+  transition: transform 0.5s;
+}
+.ghost {
+  opacity: 0.5;
+  background: #c8ebfb;
+}
 h1 {
   font-size: 16px;
   padding: 0.3em 0.3em;
