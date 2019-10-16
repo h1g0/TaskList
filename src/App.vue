@@ -276,6 +276,7 @@ body{
   padding-top: 120px;
   margin-bottom: 60px;
   /*font-size: 120%;*/
+  font-size:medium;
 }
 .result{
   width:100%;
