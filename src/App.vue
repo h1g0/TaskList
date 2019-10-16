@@ -276,7 +276,7 @@ body{
   padding-top: 120px;
   margin-bottom: 60px;
   /*font-size: 120%;*/
-  font-size:medium;
+  font-size:16px;
 }
 .result{
   width:100%;
@@ -284,7 +284,7 @@ body{
   resize: vertical;
 }
 h1 {
-  font-size: 21px;
+  font-size:22px;
   color: rgba(0,0,0,0.6);
   text-shadow: 2px 2px 3px rgba(255,255,255,0.1);
 }
