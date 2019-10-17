@@ -188,6 +188,8 @@ export default {
 
 html{
   height: 100%;
+  -webkit-font-smoothing: subpixel-antialiased;
+  -moz-osx-font-smoothing: unset;
 }
 body{
   margin:0px;

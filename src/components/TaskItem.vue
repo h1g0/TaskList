@@ -42,24 +42,6 @@
         value="▶"
         title="インデント"
       />
-      <!--
-      <input
-        type="button"
-        @click="$emit('move-item-to-up')"
-        class="menu"
-        value="🔼"
-        title="この内容を上に移動"
-        v-visible="!this.isTopItem"
-      />
-      <input
-        type="button"
-        @click="$emit('move-item-to-down')"
-        class="menu"
-        value="🔽"
-        title="この内容を下に移動"
-        v-visible="!this.isBottomItem"
-      />
-      -->
       <input
         type="button"
         @click="$emit('delete-item')"
@@ -179,7 +161,7 @@ input[type="checkbox"]:checked + label:before {
 .handle{
   color: rgba(0,0,0,0.5);
   cursor:move;
-  font-size: 20px;
+  font-size: 16px;
   margin-right: 3px;
 }
 </style>
