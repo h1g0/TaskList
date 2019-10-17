@@ -3,15 +3,15 @@
     class="task-item"
     :id="task.id"
     v-bind:style="{paddingLeft: task.indent * this.indentWidth + 'px'}"
-    @mouseenter="this.isShowItemButtons=true;"
-    @mouseleave="this.isShowItemButtons=false;"
+    @mouseenter="showItemButtons"
+    @mouseleave="hideItemButtons"
   >
-  <span class="handle"></span>
+  <span class="handle" v-visible="this.isShowItemButtons">⠿</span>
     <input type="checkbox" :id="task.id" v-model="task.checked" @change="$emit('save-item')" />
     <label :for="task.id" @click="(task.checked)?task.checked=false:task.checked=true" style="display:inline-block;">&nbsp;</label>
     <div
       v-show=" ! isEditing"
-      @click="this.isEditing=true;"
+      @click="showEditItemText"
       v-bind:style="{display:'inline-block', cursor: 'text', width:500 - task.indent * this.indentWidth + 'px',height:'1em', textDecoration: (task.checked)?'line-through':'none'}"
     >{{ task.text }}</div>
     <input
@@ -20,8 +20,8 @@
       v-model="task.text"
       v-show="isEditing"
       @change="$emit('save-item')"
-      @blur="this.isEditing=false;"
-      @keyup.enter="this.isEditing=false;"
+      @blur="hideEditItemText"
+      @keyup.enter="hideEditItemText"
       v-bind:style="{display:'inline-block', width:500 - task.indent * 20  + 'px', height:'1em', textDecoration: (task.checked)?'line-through':'none'}"
       title="内容"
     />
@@ -29,7 +29,7 @@
       <input type="button" @click="$emit('add-item')" class="menu" value="➕" title="下に項目を追加" />
       <input
         type="button"
-        @click="(task.indent > 0)?task.indent--:task.indent=0;"
+        @click="function(){(task.indent > 0)?task.indent--:task.indent=0;}"
         class="menu"
         value="◀"
         title="インデントを戻す"
@@ -112,6 +112,19 @@ export default {
         this.isDeletableItem = false;
       }
     },
+    showEditItemText: function() {
+      this.isEditing=true;
+      this.setFocusToTextInput();
+    },
+    hideEditItemText: function() {
+      this.isEditing = false;
+    },
+    showItemButtons: function() {
+      this.isShowItemButtons = true;
+    },
+    hideItemButtons: function() {
+      this.isShowItemButtons = false;
+    },
     setFocusToTextInput: function() {
       this.$nextTick(() => {
         this.$refs.input.focus();
@@ -161,5 +174,12 @@ input[type="checkbox"]:checked + label:before {
   border-bottom-color: green;
   -webkit-transform: rotate(45deg);
   transform: rotate(45deg);
+}
+
+.handle{
+  color: rgba(0,0,0,0.5);
+  cursor:move;
+  font-size: 20px;
+  margin-right: 3px;
 }
 </style>

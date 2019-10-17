@@ -10,10 +10,11 @@
       v-model="taskList"
       v-bind="dragOptions"
       group="task"
+      handle=".handle"
       @start="drag=true"
       @end="drag=false"
     >
-      <transition-group type="transition">
+      <!-- <transition-group type="transition"> -->
       <task-item
         v-for="(item,index) in taskList"
         v-bind:task="item"
@@ -25,7 +26,7 @@
         @delete-item="deleteItem(index)"
         @save-item="saveItem()"
       ></task-item>
-      </transition-group>
+     <!-- </transition-group> -->
     </draggable>
     </div>
     <div class="output">
@@ -103,35 +104,6 @@ export default {
       this.taskList.splice(lowerIndex, 1, this.taskList[upperIndex]);
       this.taskList.splice(upperIndex, 1, temp);
     },
-    /*
-    moveItemToUp: function(index) {
-      if (this.$refs[index]["0"].isTopItem) {
-        return;
-      }
-      this.$refs[index]["0"].isShowItemButtons=false;
-      this.replaceItem(index - 1, index);
-      this.saveItem();
-    },
-    moveItemToDown: function(index) {
-      if (this.$refs[index]["0"].isBottomItem) {
-        return;
-      }
-      this.$refs[index]["0"].isShowItemButtons=false;
-      this.replaceItem(index, index + 1);
-      this.saveItem();
-    },
-    moveItemToRight: function(index) {
-      this.taskList[index].indent++;
-      this.saveItem();
-    },
-    moveItemToLeft: function(index) {
-      if (this.taskList[index].indent <= 0) {
-        return;
-      }
-      this.taskList[index].indent--;
-      this.saveItem();
-    },
-    */
     deleteItem: function(index) {
       if (!this.$refs[index]["0"].isDeletableItem) {
         return;
@@ -142,21 +114,6 @@ export default {
       this.taskList.splice(index, 1);
       this.saveItem();
     },
-    /*
-    showEditItemText: function(index) {
-      this.$set(this.$refs[index]["0"], "isEditing", true);
-      this.$refs[index]["0"].setFocusToTextInput();
-    },
-    hideEditItemText: function(index) {
-      this.$refs[index]["0"].isEditing = false;
-    },
-    showItemButtons: function(index) {
-      this.$refs[index]["0"].isShowItemButtons = true;
-    },
-    hideItemButtons: function(index) {
-      this.$refs[index]["0"].isShowItemButtons = false;
-    },
-    */
     saveItem: function() {
       localStorage.taskList = JSON.stringify(this.taskList);
     },
