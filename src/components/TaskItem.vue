@@ -3,15 +3,15 @@
     class="task-item"
     :id="task.id"
     v-bind:style="{paddingLeft: task.indent * this.indentWidth + 'px'}"
-    @mouseenter="$emit('show-item-buttons')"
-    @mouseleave="$emit('hide-item-buttons')"
+    @mouseenter="this.isShowItemButtons=true;"
+    @mouseleave="this.isShowItemButtons=false;"
   >
   <span class="handle"></span>
     <input type="checkbox" :id="task.id" v-model="task.checked" @change="$emit('save-item')" />
-    <label :for="task.id" @click="function(){task.checked?task.checked=false:task.checked=true}" style="display:inline-block;">&nbsp;</label>
+    <label :for="task.id" @click="(task.checked)?task.checked=false:task.checked=true" style="display:inline-block;">&nbsp;</label>
     <div
       v-show=" ! isEditing"
-      @click="$emit('show-edit-item-text')"
+      @click="this.isEditing=true;"
       v-bind:style="{display:'inline-block', cursor: 'text', width:500 - task.indent * this.indentWidth + 'px',height:'1em', textDecoration: (task.checked)?'line-through':'none'}"
     >{{ task.text }}</div>
     <input
@@ -20,8 +20,8 @@
       v-model="task.text"
       v-show="isEditing"
       @change="$emit('save-item')"
-      @blur="$emit('hide-edit-item-text')"
-      @keyup.enter="$emit('hide-edit-item-text')"
+      @blur="this.isEditing=false;"
+      @keyup.enter="this.isEditing=false;"
       v-bind:style="{display:'inline-block', width:500 - task.indent * 20  + 'px', height:'1em', textDecoration: (task.checked)?'line-through':'none'}"
       title="内容"
     />
@@ -29,7 +29,7 @@
       <input type="button" @click="$emit('add-item')" class="menu" value="➕" title="下に項目を追加" />
       <input
         type="button"
-        @click="$emit('move-item-to-left')"
+        @click="(task.indent > 0)?task.indent--:task.indent=0;"
         class="menu"
         value="◀"
         title="インデントを戻す"
@@ -37,7 +37,7 @@
       />
       <input
         type="button"
-        @click="$emit('move-item-to-right')"
+        @click="task.indent++;"
         class="menu"
         value="▶"
         title="インデント"

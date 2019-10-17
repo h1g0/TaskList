@@ -23,14 +23,6 @@
         :ref="index"
         @add-item="addItem(index)"
         @delete-item="deleteItem(index)"
-        @move-item-to-up="moveItemToUp(index)"
-        @move-item-to-down="moveItemToDown(index)"
-        @move-item-to-left="moveItemToLeft(index)"
-        @move-item-to-right="moveItemToRight(index)"
-        @show-edit-item-text="showEditItemText(index)"
-        @hide-edit-item-text="hideEditItemText(index)"
-        @show-item-buttons="showItemButtons(index)"
-        @hide-item-buttons="hideItemButtons(index)"
         @save-item="saveItem()"
       ></task-item>
       </transition-group>
@@ -111,6 +103,7 @@ export default {
       this.taskList.splice(lowerIndex, 1, this.taskList[upperIndex]);
       this.taskList.splice(upperIndex, 1, temp);
     },
+    /*
     moveItemToUp: function(index) {
       if (this.$refs[index]["0"].isTopItem) {
         return;
@@ -138,6 +131,7 @@ export default {
       this.taskList[index].indent--;
       this.saveItem();
     },
+    */
     deleteItem: function(index) {
       if (!this.$refs[index]["0"].isDeletableItem) {
         return;
@@ -148,6 +142,7 @@ export default {
       this.taskList.splice(index, 1);
       this.saveItem();
     },
+    /*
     showEditItemText: function(index) {
       this.$set(this.$refs[index]["0"], "isEditing", true);
       this.$refs[index]["0"].setFocusToTextInput();
@@ -161,6 +156,7 @@ export default {
     hideItemButtons: function(index) {
       this.$refs[index]["0"].isShowItemButtons = false;
     },
+    */
     saveItem: function() {
       localStorage.taskList = JSON.stringify(this.taskList);
     },
