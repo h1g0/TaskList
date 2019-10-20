@@ -3,8 +3,11 @@
     <div class="header">
       <h1>TODO</h1>
       <div class="header-menu">
-        <button class="header-menu-button" @click="showOutput()"> <img src="img/note-text.svg" /></button>
-        <button class="header-menu-button" @click="showSettings()" ><img src="img/settings.svg" /></button>
+        <!-- 
+          <button class="header-menu-button" @click="showOutput()"> <img src="img/plus.svg" title="カラムを追加"/></button>
+        -->
+        <button class="header-menu-button" @click="showOutput()"> <img src="img/note-text.svg" title="出力画面を表示/非表示"/></button>
+        <button class="header-menu-button" @click="showSettings()" ><img src="img/settings.svg" title="設定画面を表示/非表示"/></button>
       </div>
     </div>
 
@@ -35,14 +38,14 @@
     </div>
     </div>
     <div class="output" v-show="taskListSettings.isOutputVisible">
-      <input type="button" value="出力" class="menu" @click="outputResult" />
-      <input type="button" value="コピー" class="menu" @click="copyResult" />
-      <input type="button" value="✖" class="close-button" @click="showOutput" />
+      <input type="button" value="出力" class="menu" @click="outputResult" title="テキストとして出力" />
+      <input type="button" value="コピー" class="menu" @click="copyResult" title="出力結果をクリップボードにコピー"/>
+      <input type="button" value="✖" class="close-button" @click="showOutput" title="閉じる" />
       <br />
       <textarea class="result" v-bind:value="outputStr"></textarea>
     </div>
     <div class="settings" v-show="this.taskListSettings.isSettingsVisible">
-      <input type="button" value="✖" class="close-button"  @click="showSettings" />
+      <input type="button" value="✖" class="close-button"  @click="showSettings" title="閉じる" />
       <h2>設定</h2>
       <ul style="padding-left:20px;">
       <li>ヘッダ：<br />
