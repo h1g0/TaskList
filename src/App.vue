@@ -2,6 +2,10 @@
   <div id="app">
     <div class="header">
       <h1>TODO</h1>
+      <div class="header-menu">
+        <button class="header-menu-button" @click="showOutput()"> <img src="img/note-text.svg" /></button>
+        <button class="header-menu-button" @click="showSettings()" ><img src="img/settings.svg" /></button>
+      </div>
     </div>
 
     <div class="main-content">
@@ -14,7 +18,7 @@
       @start="drag=true"
       @end="drag=false"
     >
-      <!-- <transition-group type="transition"> -->
+    <transition-group type="transition" :name="drag ? 'flip-list' : null">
       <task-item
         v-for="(item,index) in taskList"
         v-bind:task="item"
@@ -26,17 +30,43 @@
         @delete-item="deleteItem(index)"
         @save-item="saveItem()"
       ></task-item>
-     <!-- </transition-group> -->
+    </transition-group>
     </draggable>
     </div>
-    <div class="output">
+    </div>
+    <div class="output" v-show="taskListSettings.isOutputVisible">
       <input type="button" value="出力" class="menu" @click="outputResult" />
       <input type="button" value="コピー" class="menu" @click="copyResult" />
+      <input type="button" value="✖" class="close-button" @click="showOutput" />
       <br />
       <textarea class="result" v-bind:value="outputStr"></textarea>
     </div>
+    <div class="settings" v-show="this.taskListSettings.isSettingsVisible">
+      <input type="button" value="✖" class="close-button"  @click="showSettings" />
+      <h2>設定</h2>
+      <ul style="padding-left:20px;">
+      <li>ヘッダ：<br />
+      <input type="text" class="settings-text" @change="saveSettings" v-model="taskListOutputTemplate.header"></li>
+      <li>インデントの文字：<br />
+      <input type="text" class="settings-text"  @change="saveSettings" v-model="taskListOutputTemplate.indentStr"></li>
+      <li>チェックボックス（未）：<br />
+      <input type="text" class="settings-text"  @change="saveSettings" v-model="taskListOutputTemplate.uncheckedText"></li>
+      <li>チェックボックス（済）：<br />
+      <input type="text" class="settings-text"  @change="saveSettings" v-model="taskListOutputTemplate.checkedText"></li>
+      <li>本文：<br />
+      <input type="text" class="settings-text"  @change="saveSettings" v-model="taskListOutputTemplate.body"></li>
+      <li>フッタ：<br />
+      <input type="text" class="settings-text"  @change="saveSettings" v-model="taskListOutputTemplate.footer"></li>
+      </ul>
+      <div style="border: dotted 2px #7db4e6;">
+        <ul style="font-size:small">
+        <li>{IndentText}: インデントの文字</li>
+        <li>{CheckBoxText}: チェックボックス</li>
+        <li>{Text}: 本文</li>
+        <li>{br}: 改行</li>
+        </ul>
+      </div>
     </div>
-
   </div>
 </template>
 
@@ -64,8 +94,10 @@ export default {
         checkedText: "[x]"
       },
       taskListSettings: {
-        showSettings: false
-      }
+        isSettingsVisible: false,
+        isOutputVisible: false,
+      },
+      drag: false,
     };
   },
   computed: {
@@ -86,6 +118,18 @@ export default {
     },
     buildNewItem: function() {
       return { id: this.buildId(), indent: 0, checked: false, text: "" };
+    },
+    showOutput:function(){
+      (this.taskListSettings.isOutputVisible)?
+      this.taskListSettings.isOutputVisible=false:
+      this.taskListSettings.isOutputVisible=true;
+      this.saveSettings();
+    },
+    showSettings:function(){
+      (this.taskListSettings.isSettingsVisible)?
+      this.taskListSettings.isSettingsVisible=false:
+      this.taskListSettings.isSettingsVisible=true;
+      this.saveSettings();
     },
     setAllItemState: function() {
       for (var item in this.$refs) {
@@ -116,6 +160,10 @@ export default {
     },
     saveItem: function() {
       localStorage.taskList = JSON.stringify(this.taskList);
+    },
+    saveSettings: function(){
+      localStorage.taskListOutputTemplate = JSON.stringify(this.taskListOutputTemplate);
+      localStorage.taskListSettings = JSON.stringify(this.taskListSettings);
     },
     replaceOutputStr: function(index, template){
       let indentStr = "";
@@ -149,6 +197,12 @@ export default {
     if (localStorage.taskList) {
       this.taskList = JSON.parse(localStorage.taskList);
     }
+    if (localStorage.taskListOutputTemplate) {
+      this.taskListOutputTemplate = JSON.parse(localStorage.taskListOutputTemplate);
+    }
+    if (localStorage.taskListSettings) {
+      this.taskListSettings = JSON.parse(localStorage.taskListSettings);
+    }
   },
   updated: function() {
     this.$nextTick(function() {
@@ -160,6 +214,7 @@ export default {
 </script>
 
 <style>
+
 .v-enter-active,
 .v-leave-active,
 .v-move {
@@ -177,9 +232,14 @@ export default {
   opacity: 0;
   transform: translateX(64px);
 }
+
 .flip-list-move {
+  transition: transform 0s;
+}
+.no-move {
   transition: transform 0.5s;
 }
+
 .ghost {
   opacity: 0.5;
   background: #fdfcf4;
@@ -204,17 +264,33 @@ body{
 }
 .header{
   position: fixed;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   top: 0;
   left: 0;
   box-shadow:0px 0px 10px;
-  z-index: 999;
+  z-index: 1000;
   width: 100%;
   background: linear-gradient(to top, #ece9e6, #ffffff);
   margin: 0px 0px 0px 0px;
-  padding-left: 30px;
   height: 60px;
 }
+.header-menu{
+  margin-right: 30px;
+  display: flex;
+  align-items: center;
+}
+.sidebar{
+  position: fixed;
+  z-index: 998;
+  top: 60px;
+  left: 0;
 
+  width:50px;
+  height:100%;
+  background: linear-gradient(to left, #ece9e6, #ffffff);
+}
 .main-content{
   position: relative;
   margin-left: auto;
@@ -223,7 +299,7 @@ body{
   padding: 0px 20px 0px 20px;
   background-color: #ffffff;
   box-shadow: -8px 0px 8px 0px rgba(0,0,0,0.3), 8px 0px 8px 0px rgba(0,0,0,0.3);
-  width: 750px;
+  width: 800px;
   min-height: 100%;
 }
 
@@ -231,17 +307,46 @@ body{
   padding-top: 120px;
   margin-bottom: 60px;
   /*font-size: 120%;*/
-  font-size:16px;
+  /*font-size:16px;*/
+}
+.output{
+  z-index: 2;
+  position: absolute;
+  top: 65px;
+  right:5px;
+  width: 500px;
+  height: auto;
+  padding: 10px;
+  background-color: #ffffff;
+  box-shadow:0px 0px 10px;
+  border-radius: 10px;
 }
 .result{
   width:100%;
   height:10em;
   resize: vertical;
 }
+.settings{
+  z-index: 3;
+  position: absolute;
+  top: 65px;
+  right:5px;
+  width: 300px;
+  height: auto;
+  padding: 10px;
+  background-color: #ffffff;
+  box-shadow:0px 0px 10px;
+  border-radius: 10px;
+}
+.settings-text{
+  width: 100%;
+}
 h1 {
   font-size:22px;
   color: rgba(0,0,0,0.6);
   text-shadow: 2px 2px 3px rgba(255,255,255,0.1);
+  display: inline-block;
+  padding-left:30px;
 }
 h2 {
   font-size: 16px;
@@ -282,11 +387,34 @@ button {
   color: #f4f4f4;
   background: #7db4e6;
 }
+.close-button{
+  float:right;
+  border:none;
+  background-color: transparent;
+  color: #000;
+}
+.close-button:hover{
+  filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.4));
+}
+.header-menu-button{
+  cursor: pointer;
+  color: #49494967;
+  opacity: 0.5;
+  font-size: 20px;
+  transition: 0.3s;
+  margin:5px;
+}
+.header-menu-button:hover {
+  opacity: 1.0;
+  filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.4));
+
+}
+
 hr {
   height: 1px;
   border: none;
-  background-image: linear-gradient(90deg, #d7d7d7, #ffffff);
-  width: 640px;
+  background-image: linear-gradient(90deg, #d7d7d7, rgba(0,0,0,0));
+  width: 100%;
   text-align: left;
   margin-left: 0px;
 }

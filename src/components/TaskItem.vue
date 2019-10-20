@@ -2,17 +2,17 @@
   <div
     class="task-item"
     :id="task.id"
-    v-bind:style="{paddingLeft: task.indent * this.indentWidth + 'px'}"
+    v-bind:style="{marginLeft: task.indent * this.indentWidth + 'px',width:'100%'}"
+    @click="showEditItemText"
     @mouseenter="showItemButtons"
     @mouseleave="hideItemButtons"
   >
   <span class="handle" v-visible="this.isShowItemButtons">⠿</span>
     <input type="checkbox" :id="task.id" v-model="task.checked" @change="$emit('save-item')" />
-    <label :for="task.id" @click="(task.checked)?task.checked=false:task.checked=true" style="display:inline-block;">&nbsp;</label>
+    <label :for="task.id" @click.stop="(task.checked)?task.checked=false:task.checked=true" style="display:inline-block;">&nbsp;</label>
     <div
       v-show=" ! isEditing"
-      @click="showEditItemText"
-      v-bind:style="{display:'inline-block', cursor: 'text', width:500 - task.indent * this.indentWidth + 'px',height:'1em', textDecoration: (task.checked)?'line-through':'none'}"
+      v-bind:style="{display:'inline-block', cursor: 'text', width:'80%',height:'1em', textDecoration: (task.checked)?'line-through':'none'}"
     >{{ task.text }}</div>
     <input
       type="text"
@@ -22,14 +22,14 @@
       @change="$emit('save-item')"
       @blur="hideEditItemText"
       @keyup.enter="hideEditItemText"
-      v-bind:style="{display:'inline-block', width:500 - task.indent * 20  + 'px', height:'1em', textDecoration: (task.checked)?'line-through':'none'}"
+      v-bind:style="{display:'inline-block', width:'80%', height:'1em', textDecoration: (task.checked)?'line-through':'none'}"
       title="内容"
     />
     <div v-show="isShowItemButtons" style="display:inline-block; position:relative; float: right;">
-      <input type="button" @click="$emit('add-item')" class="menu" value="➕" title="下に項目を追加" />
+      <input type="button" @click.stop="$emit('add-item')" class="menu" value="➕" title="下に項目を追加" />
       <input
         type="button"
-        @click="function(){(task.indent > 0)?task.indent--:task.indent=0;}"
+        @click.stop="function(){(task.indent > 0)?task.indent--:task.indent=0;}"
         class="menu"
         value="◀"
         title="インデントを戻す"
@@ -37,14 +37,14 @@
       />
       <input
         type="button"
-        @click="task.indent++;"
+        @click.stop="task.indent++;"
         class="menu"
         value="▶"
         title="インデント"
       />
       <input
         type="button"
-        @click="$emit('delete-item')"
+        @click.stop="$emit('delete-item')"
         class="menu"
         value="❌"
         title="この項目を削除"
