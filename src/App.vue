@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <div class="header">
-      <h1>TODO</h1>
+      <h1>TaskList</h1>
       <div class="header-menu">
         <!-- 
           <button class="header-menu-button" @click="showOutput()"> <img src="img/plus.svg" title="カラムを追加"/></button>
