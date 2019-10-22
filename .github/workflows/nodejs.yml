@@ -19,5 +19,9 @@ jobs:
         npm run build --if-present
       env:
         CI: true
+        
+    - name: kill old zip
+      run: rm TaskList.zip
+      
     - name: zip built files
       run: zip -r TaskList.zip dist
