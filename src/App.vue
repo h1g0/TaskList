@@ -13,30 +13,31 @@
 
     <div class="main-content">
       <div class="tasks">
-    <draggable
-      v-model="taskList"
-      v-bind="dragOptions"
-      group="task"
-      handle=".handle"
-      @start="drag=true"
-      @end="drag=false"
-    >
-    <transition-group type="transition" :name="drag ? 'flip-list' : null">
-      <task-item
-        v-for="(item,index) in taskList"
-        v-bind:task="item"
-        v-bind:index="index"
-        v-bind:totalsize="taskList.length"
-        v-bind:key="item.id"
-        :ref="index"
-        @add-item="addItem(index)"
-        @delete-item="deleteItem(index)"
-        @save-item="saveItem()"
-      ></task-item>
-    </transition-group>
-    </draggable>
+        <draggable
+          v-model="taskList"
+          v-bind="dragOptions"
+          group="task"
+          handle=".handle"
+          @start="drag=true"
+          @end="drag=false"
+        >
+          <transition-group type="transition" :name="drag ? 'flip-list' : null">
+            <task-item
+              v-for="(item,index) in taskList"
+              v-bind:task="item"
+              v-bind:index="index"
+              v-bind:totalsize="taskList.length"
+              v-bind:key="item.id"
+              :ref="index"
+              @add-item="addItem(index)"
+              @delete-item="deleteItem(index)"
+              @save-item="saveItem()"
+            ></task-item>
+          </transition-group>
+        </draggable>
+      </div>
     </div>
-    </div>
+
     <div class="output" v-show="taskListSettings.isOutputVisible">
       <input type="button" value="出力" class="menu" @click="outputResult" title="テキストとして出力" />
       <input type="button" value="コピー" class="menu" @click="copyResult" title="出力結果をクリップボードにコピー"/>
@@ -48,25 +49,25 @@
       <input type="button" value="✖" class="close-button"  @click="showSettings" title="閉じる" />
       <h2>設定</h2>
       <ul style="padding-left:20px;">
-      <li>ヘッダ：<br />
-      <input type="text" class="settings-text" @change="saveSettings" v-model="taskListOutputTemplate.header"></li>
-      <li>インデントの文字：<br />
-      <input type="text" class="settings-text"  @change="saveSettings" v-model="taskListOutputTemplate.indentStr"></li>
-      <li>チェックボックス（未）：<br />
-      <input type="text" class="settings-text"  @change="saveSettings" v-model="taskListOutputTemplate.uncheckedText"></li>
-      <li>チェックボックス（済）：<br />
-      <input type="text" class="settings-text"  @change="saveSettings" v-model="taskListOutputTemplate.checkedText"></li>
-      <li>本文：<br />
-      <input type="text" class="settings-text"  @change="saveSettings" v-model="taskListOutputTemplate.body"></li>
-      <li>フッタ：<br />
-      <input type="text" class="settings-text"  @change="saveSettings" v-model="taskListOutputTemplate.footer"></li>
+        <li>ヘッダ：<br />
+        <input type="text" class="settings-text" @change="saveSettings" v-model="taskListOutputTemplate.header"></li>
+        <li>インデントの文字：<br />
+        <input type="text" class="settings-text"  @change="saveSettings" v-model="taskListOutputTemplate.indentStr"></li>
+        <li>チェックボックス（未）：<br />
+        <input type="text" class="settings-text"  @change="saveSettings" v-model="taskListOutputTemplate.uncheckedText"></li>
+        <li>チェックボックス（済）：<br />
+        <input type="text" class="settings-text"  @change="saveSettings" v-model="taskListOutputTemplate.checkedText"></li>
+        <li>本文：<br />
+        <input type="text" class="settings-text"  @change="saveSettings" v-model="taskListOutputTemplate.body"></li>
+        <li>フッタ：<br />
+        <input type="text" class="settings-text"  @change="saveSettings" v-model="taskListOutputTemplate.footer"></li>
       </ul>
       <div style="border: dotted 2px #7db4e6;">
         <ul style="font-size:small">
-        <li>{IndentText}: インデントの文字</li>
-        <li>{CheckBoxText}: チェックボックス</li>
-        <li>{Text}: 本文</li>
-        <li>{br}: 改行</li>
+          <li>{IndentText}: インデントの文字</li>
+          <li>{CheckBoxText}: チェックボックス</li>
+          <li>{Text}: 本文</li>
+          <li>{br}: 改行</li>
         </ul>
       </div>
     </div>
