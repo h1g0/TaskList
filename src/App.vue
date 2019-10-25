@@ -2,10 +2,8 @@
   <div id="app">
     <div class="header">
       <h1>TaskList</h1>
-      <div class="header-menu">
-        <!-- 
-          <button class="header-menu-button" @click="showOutput()"> <img src="img/plus.svg" title="カラムを追加"/></button>
-        -->
+      <div class="header-menu"> 
+        <button class="header-menu-button" @click="showOutput()"> <img src="img/plus.svg" title="カラムを追加"/></button>
         <button class="header-menu-button" @click="showOutput()"> <img src="img/note-text.svg" title="出力画面を表示/非表示"/></button>
         <button class="header-menu-button" @click="showSettings()" ><img src="img/settings.svg" title="設定画面を表示/非表示"/></button>
       </div>
