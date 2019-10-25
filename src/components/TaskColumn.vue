@@ -126,7 +126,6 @@ export default {
   box-shadow: -8px 0px 8px 0px rgba(0,0,0,0.3), 8px 0px 8px 0px rgba(0,0,0,0.3);
   min-width: 350px;
   height: auto;
-  overflow: hidden;
 }
 
 </style>
