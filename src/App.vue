@@ -2,41 +2,61 @@
   <div id="app">
     <div class="header">
       <h1>TaskList</h1>
-      <div class="header-menu">
-        <!-- 
-          <button class="header-menu-button" @click="showOutput()"> <img src="img/plus.svg" title="カラムを追加"/></button>
-        -->
+      <div class="header-menu"> 
+        <button class="header-menu-button" @click="addColumn()"> <img src="img/plus.svg" title="カラムを追加"/></button>
         <button class="header-menu-button" @click="showOutput()"> <img src="img/note-text.svg" title="出力画面を表示/非表示"/></button>
         <button class="header-menu-button" @click="showSettings()" ><img src="img/settings.svg" title="設定画面を表示/非表示"/></button>
       </div>
     </div>
-
-    <div class="main-content">
-      <div class="tasks">
     <draggable
-      v-model="taskList"
+      v-model="taskColumnList"
       v-bind="dragOptions"
-      group="task"
-      handle=".handle"
+      group="column"
       @start="drag=true"
       @end="drag=false"
-    >
-    <transition-group type="transition" :name="drag ? 'flip-list' : null">
-      <task-item
-        v-for="(item,index) in taskList"
-        v-bind:task="item"
+      class="task-colmun-container">
+      <task-column 
+        v-for="(column,index) in taskColumnList"
+        v-bind:taskList="column.taskList"
         v-bind:index="index"
-        v-bind:totalsize="taskList.length"
-        v-bind:key="item.id"
+        v-bind:totalsize="taskColumnList.length"
+        v-bind:key="column.id"
         :ref="index"
-        @add-item="addItem(index)"
-        @delete-item="deleteItem(index)"
+        @add-column="addColumn(index)"
+        @delete-colmn="deleteColumn(index)"
         @save-item="saveItem()"
-      ></task-item>
-    </transition-group>
+      ></task-column>
     </draggable>
+
+
+<!--
+    <div class="main-content">
+      <div class="tasks">
+        <draggable
+          v-model="taskList"
+          v-bind="dragOptions"
+          group="task"
+          handle=".handle"
+          @start="drag=true"
+          @end="drag=false"
+        >
+          <transition-group type="transition" :name="drag ? 'flip-list' : null">
+            <task-item
+              v-for="(item,index) in taskList"
+              v-bind:task="item"
+              v-bind:index="index"
+              v-bind:totalsize="taskList.length"
+              v-bind:key="item.id"
+              :ref="index"
+              @add-item="addItem(index)"
+              @delete-item="deleteItem(index)"
+              @save-item="saveItem()"
+            ></task-item>
+          </transition-group>
+        </draggable>
+      </div>
     </div>
-    </div>
+-->
     <div class="output" v-show="taskListSettings.isOutputVisible">
       <input type="button" value="出力" class="menu" @click="outputResult" title="テキストとして出力" />
       <input type="button" value="コピー" class="menu" @click="copyResult" title="出力結果をクリップボードにコピー"/>
@@ -48,25 +68,25 @@
       <input type="button" value="✖" class="close-button"  @click="showSettings" title="閉じる" />
       <h2>設定</h2>
       <ul style="padding-left:20px;">
-      <li>ヘッダ：<br />
-      <input type="text" class="settings-text" @change="saveSettings" v-model="taskListOutputTemplate.header"></li>
-      <li>インデントの文字：<br />
-      <input type="text" class="settings-text"  @change="saveSettings" v-model="taskListOutputTemplate.indentStr"></li>
-      <li>チェックボックス（未）：<br />
-      <input type="text" class="settings-text"  @change="saveSettings" v-model="taskListOutputTemplate.uncheckedText"></li>
-      <li>チェックボックス（済）：<br />
-      <input type="text" class="settings-text"  @change="saveSettings" v-model="taskListOutputTemplate.checkedText"></li>
-      <li>本文：<br />
-      <input type="text" class="settings-text"  @change="saveSettings" v-model="taskListOutputTemplate.body"></li>
-      <li>フッタ：<br />
-      <input type="text" class="settings-text"  @change="saveSettings" v-model="taskListOutputTemplate.footer"></li>
+        <li>ヘッダ：<br />
+        <input type="text" class="settings-text" @change="saveSettings" v-model="taskListOutputTemplate.header"></li>
+        <li>インデントの文字：<br />
+        <input type="text" class="settings-text"  @change="saveSettings" v-model="taskListOutputTemplate.indentStr"></li>
+        <li>チェックボックス（未）：<br />
+        <input type="text" class="settings-text"  @change="saveSettings" v-model="taskListOutputTemplate.uncheckedText"></li>
+        <li>チェックボックス（済）：<br />
+        <input type="text" class="settings-text"  @change="saveSettings" v-model="taskListOutputTemplate.checkedText"></li>
+        <li>本文：<br />
+        <input type="text" class="settings-text"  @change="saveSettings" v-model="taskListOutputTemplate.body"></li>
+        <li>フッタ：<br />
+        <input type="text" class="settings-text"  @change="saveSettings" v-model="taskListOutputTemplate.footer"></li>
       </ul>
       <div style="border: dotted 2px #7db4e6;">
         <ul style="font-size:small">
-        <li>{IndentText}: インデントの文字</li>
-        <li>{CheckBoxText}: チェックボックス</li>
-        <li>{Text}: 本文</li>
-        <li>{br}: 改行</li>
+          <li>{IndentText}: インデントの文字</li>
+          <li>{CheckBoxText}: チェックボックス</li>
+          <li>{Text}: 本文</li>
+          <li>{br}: 改行</li>
         </ul>
       </div>
     </div>
@@ -74,19 +94,19 @@
 </template>
 
 <script>
-import TaskItem from "./components/TaskItem.vue";
+import TaskColumn from "./components/TaskColumn.vue";
 import draggable from 'vuedraggable'
 
 export default {
   name: "app",
   components: {
-    TaskItem,
+    TaskColumn,
     draggable
   },
   directives: {},
   data: function() {
     return {
-      taskList: [this.buildNewItem()],
+      taskColumnList: [this.buildNewColumn()],
       outputStr: "",
       taskListOutputTemplate: {
         header: "## TODO{br}{br}",
@@ -119,8 +139,24 @@ export default {
         return ((Math.random() * 16) | 0).toString(16);
       });
     },
-    buildNewItem: function() {
-      return { id: this.buildId(), indent: 0, checked: false, text: "" };
+    buildNewColumn: function() {
+      return {
+        id: this.buildId(), 
+        title: "",
+        taskList: [],
+      };
+    },
+    addColumn: function(index) {
+      this.taskColumnList.splice(index + 1, 0, this.buildNewColumn());
+      //this.taskList[index + 1].indent = this.taskList[index].indent;
+      this.saveItem();
+    },
+    deleteColumn: function(index) {
+      if (!window.confirm("カラムを削除します。よろしいですか？")) {
+        return;
+      }
+      this.taskColumnList.splice(index, 1);
+      this.saveItem();
     },
     showOutput:function(){
       (this.taskListSettings.isOutputVisible)?
@@ -141,28 +177,8 @@ export default {
         }
       }
     },
-    addItem: function(index) {
-      this.taskList.splice(index + 1, 0, this.buildNewItem());
-      this.taskList[index + 1].indent = this.taskList[index].indent;
-      this.saveItem();
-    },
-    replaceItem: function(upperIndex, lowerIndex) {
-      var temp = this.taskList[lowerIndex];
-      this.taskList.splice(lowerIndex, 1, this.taskList[upperIndex]);
-      this.taskList.splice(upperIndex, 1, temp);
-    },
-    deleteItem: function(index) {
-      if (!this.$refs[index]["0"].isDeletableItem) {
-        return;
-      }
-      if (!window.confirm("アイテムを削除します。よろしいですか？")) {
-        return;
-      }
-      this.taskList.splice(index, 1);
-      this.saveItem();
-    },
     saveItem: function() {
-      localStorage.taskList = JSON.stringify(this.taskList);
+      localStorage.taskColumnList = JSON.stringify(this.taskColumnList);
     },
     saveSettings: function(){
       localStorage.taskListOutputTemplate = JSON.stringify(this.taskListOutputTemplate);
@@ -198,7 +214,7 @@ export default {
   },
   mounted() {
     if (localStorage.taskList) {
-      this.taskList = JSON.parse(localStorage.taskList);
+      this.taskColumnList = JSON.parse(localStorage.taskColumnList);
     }
     if (localStorage.taskListOutputTemplate) {
       this.taskListOutputTemplate = JSON.parse(localStorage.taskListOutputTemplate);
@@ -257,13 +273,14 @@ html{
 body{
   margin:0px;
   height: 100%;
-  background-color:#414345;
+  background: linear-gradient(to top, #414345, #232526);
+  background-attachment: fixed;
 }
 #app{
   margin: 0px;
   padding: 0px;
   height: 100%;
-  background: linear-gradient(to top, #414345, #232526);
+
 }
 .header{
   position: fixed;
@@ -280,9 +297,13 @@ body{
   height: 60px;
 }
 .header-menu{
-  margin-right: 30px;
+  margin-right: 10px;
   display: flex;
   align-items: center;
+}
+.header-dummy{
+  width:100%;
+  height:60px;
 }
 .sidebar{
   position: fixed;
@@ -294,18 +315,14 @@ body{
   height:100%;
   background: linear-gradient(to left, #ece9e6, #ffffff);
 }
-.main-content{
-  position: relative;
-  margin-left: auto;
-  margin-right: auto;
-  z-index: 1;
-  padding: 0px 20px 0px 20px;
-  background-color: #ffffff;
-  box-shadow: -8px 0px 8px 0px rgba(0,0,0,0.3), 8px 0px 8px 0px rgba(0,0,0,0.3);
-  width: 800px;
-  min-height: 100%;
+.task-colmun-container{
+  width:auto;
+  height: 100%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: stretch;
+  overflow-x: scroll;
 }
-
 .tasks{
   padding-top: 120px;
   margin-bottom: 60px;
@@ -349,7 +366,7 @@ h1 {
   color: rgba(0,0,0,0.6);
   text-shadow: 2px 2px 3px rgba(255,255,255,0.1);
   display: inline-block;
-  padding-left:30px;
+  padding-left:10px;
 }
 h2 {
   font-size: 16px;
