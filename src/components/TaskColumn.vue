@@ -2,28 +2,32 @@
   <div class="column">
     <p class="column-title"
       v-show=" ! this.isTitleEditing"
-      @click.stop="showTitleEdit">{{title}}</p>
+      @click.stop="showTitleEdit">{{column.title}}</p>
     <input type="text"
-            class = "column-title"
+            class = "input-text column-title"
+            ref="title"
             v-show="this.isTitleEditing"
-            @click.stop
+            @change="saveItem"
             @blur="hideTitleEdit"
-            v-model="title">
-                  <hr />
-      <draggable
-        :list="taskList"
-        v-bind="dragOptions"
-        group="task"
-        @start="onDragDropStart"
-        @end="onDragDropEnd"
-        class="tasks"
+            v-model="column.title"
+    >
+    <hr />
+    <draggable
+      :list="column.taskList"
+      v-bind="dragOptions"
+      group="task"
+      filter=".input-text"
+      preventOnFilter=false
+      @start="onDragDropStart"
+      @end="onDragDropEnd"
+      class="tasks"
       >
       <transition-group type="transition" :name="drag ? 'flip-list' : null">
         <task-item
-          v-for="(item,index) in taskList"
+          v-for="(item,index) in column.taskList"
           v-bind:task="item"
           v-bind:index="index"
-          v-bind:totalsize="taskList.length"
+          v-bind:totalsize="column.taskList.length"
           v-bind:key="item.id"
           :ref="index"
           @add-item="addItem()"
@@ -33,7 +37,7 @@
         </transition-group>
       </draggable>
 
-    <button class="menu-button" @click="addItem">
+    <button class="task-add-button menu-button" @click="addItem">
       <img src="img/plus.svg" title="タスクを追加"/>
     </button>
   </div>
@@ -47,7 +51,7 @@ export default {
     TaskItem,
     draggable
   },
-  props: ["title","taskListProp", "index", "totalsize"],
+  props: ["columnProp", "index", "totalsize"],
   directives: {
     visible: {
       update: function(el, binding) {
@@ -57,7 +61,7 @@ export default {
   },
   data: function() {
     return {
-      taskList: this.taskListProp,
+      column: this.columnProp,
       isTitleEditing:false,
       drag: false,
     };
@@ -82,24 +86,15 @@ export default {
       return { id: this.buildId(), indent: 0, checked: false, text: "" };
     },
     addItem: function() {
-      
-      this.taskList.splice(this.taskList.length, 0, this.buildNewItem());
-      //this.taskList[index + 1].indent = this.taskList[index].indent;
+      this.column.taskList.splice(this.column.taskList.length, 0, this.buildNewItem());
       this.saveItem();
-    },
-    replaceItem: function(upperIndex, lowerIndex) {
-      var temp = this.taskList().get(lowerIndex);
-      this.taskList().splice(lowerIndex, 1, this.taskList().get(upperIndex));
-      this.taskList().splice(upperIndex, 1, temp);
+      this.$refs[this.column.taskList.length - 1]["0"].showEditItemText();
     },
     deleteItem: function(index) {
-      if (!this.$refs[index]["0"].isDeletableItem) {
-        return;
-      }
       if (!window.confirm("アイテムを削除します。よろしいですか？")) {
         return;
       }
-      this.taskList.splice(index, 1);
+      this.column.taskList.splice(index, 1);
       this.saveItem();
     },
     onDragDropStart:function(){
@@ -110,7 +105,7 @@ export default {
       this.saveItem();
     },
     saveItem:function(){
-      this.$emit('emit-item',this.index,this.taskList);
+      this.$emit('emit-item',this.index,this.column);
       this.$emit('save-item');
     },
     showTitleEdit:function(){
@@ -122,7 +117,7 @@ export default {
     },
     setFocusToTextInput: function() {
       this.$nextTick(() => {
-        this.$refs[0].input.focus();
+        this.$refs.title.focus();
       });
     },
     setAllItemState: function() {
@@ -134,9 +129,11 @@ export default {
     }
   },
   watch:{
-    taskList:function () {
+    /*
+    column:function () {
       this.saveItem();
     }
+    */
   },
   updated: function() {
     /*
@@ -163,17 +160,26 @@ export default {
   height: auto;
 }
 .column-title{
-  margin:5px;
+    cursor: text;
+  margin:10px;
   font-size: 20px;
   font-weight: bold;
   height: 1em;
-  width:95%;
+  width:80%;
+}
+.task-add-button{
+  padding: 0px;
+  margin-left:auto;
+  margin-right: auto;
+  position: relative;
+  width:100%;
 }
 .tasks{
   padding: 0px;
   position: relative;
+  min-width:350px;
   width:100%;
-  min-height: 30px;
+  min-height:30px;
 }
 
 </style>

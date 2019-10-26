@@ -12,13 +12,15 @@
       v-model="taskColumnList"
       v-bind="dragOptions"
       group="column"
+      filter=".input-text"
+      preventOnFilter="false"
       @start="onDragDropStart"
       @end="onDragDropEnd"
-      class="task-colmun-container">
+      class="task-colmun-container"
+    >
       <task-column 
         v-for="(column,index) in taskColumnList"
-        v-bind:title="column.title"
-        v-bind:taskListProp="column.taskList"
+        v-bind:columnProp="column"
         v-bind:index="index"
         v-bind:totalsize="taskColumnList.length"
         v-bind:key="column.id"
@@ -30,35 +32,6 @@
       ></task-column>
     </draggable>
 
-
-<!--
-    <div class="main-content">
-      <div class="tasks">
-        <draggable
-          v-model="taskList"
-          v-bind="dragOptions"
-          group="task"
-          handle=".handle"
-          @start="drag=true"
-          @end="drag=false"
-        >
-          <transition-group type="transition" :name="drag ? 'flip-list' : null">
-            <task-item
-              v-for="(item,index) in taskList"
-              v-bind:task="item"
-              v-bind:index="index"
-              v-bind:totalsize="taskList.length"
-              v-bind:key="item.id"
-              :ref="index"
-              @add-item="addItem(index)"
-              @delete-item="deleteItem(index)"
-              @save-item="saveItem()"
-            ></task-item>
-          </transition-group>
-        </draggable>
-      </div>
-    </div>
--->
     <div class="output" v-show="taskListSettings.isOutputVisible">
       <input type="button" value="出力" class="menu" @click="outputResult" title="テキストとして出力" />
       <input type="button" value="コピー" class="menu" @click="copyResult" title="出力結果をクリップボードにコピー"/>
@@ -189,8 +162,8 @@ export default {
         }
       }
     },
-    emitItem:function(columnIndex,taskList){
-      this.taskColumnList[columnIndex].taskList = taskList;
+    emitItem:function(columnIndex,column){
+      this.taskColumnList[columnIndex] = column;
     },
     saveItem: function() {
       localStorage.taskColumnList = JSON.stringify(this.taskColumnList);
@@ -430,7 +403,8 @@ button {
 }
 .menu-button:hover {
   opacity: 1.0;
-  filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.4));
+  color:green;
+  filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.4));
 
 }
 

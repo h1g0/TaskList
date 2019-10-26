@@ -16,37 +16,19 @@
       v-bind:style="{textDecoration: (task.checked)?'line-through':'none'}"
     >{{ task.text }}</div>
     <input
-      class = "task-item-text"
+      class = "input-text task-item-text"
       type="text"
       ref="input"
       v-model="task.text"
       v-show="isEditing"
       @change="$emit('save-item')"
-      @mousemove.stop
       @blur="hideEditItemText"
       @keyup.enter="hideEditItemText"
       v-bind:style="{ textDecoration: (task.checked)?'line-through':'none'}"
       title="内容"
     />
     <div v-show="isShowItemButtons" style="display:inline-block; position:absolute; right:0;">
-      <!--
-      <input type="button" @click.stop="$emit('add-item')" class="menu" value="➕" title="下に項目を追加" />
-      <input
-        type="button"
-        @click.stop="function(){(task.indent > 0)?task.indent--:task.indent=0;}"
-        class="menu"
-        value="◀"
-        title="インデントを戻す"
-        v-show="task.indent"
-      />
-      <input
-        type="button"
-        @click.stop="task.indent++;"
-        class="menu"
-        value="▶"
-        title="インデント"
-      />
-      -->
+
       <button
         v-show="this.isDeletableItem"
       >
@@ -151,7 +133,7 @@ input[type="checkbox"] + label:before {
   display: inline-block;
   width: 20px;
   height: 20px;
-  border: 1px solid #6cc0e5;
+  border: 1px solid #6cc1e5;
   position: absolute;
   left: 0;
   top: 0;
