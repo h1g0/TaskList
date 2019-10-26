@@ -3,27 +3,29 @@
     <div class="header">
       <h1>TaskList</h1>
       <div class="header-menu"> 
-        <button class="header-menu-button" @click="addColumn(taskColumnList.length)"> <img src="img/plus.svg" title="カラムを追加"/></button>
-        <button class="header-menu-button" @click="showOutput()"> <img src="img/note-text.svg" title="出力画面を表示/非表示"/></button>
-        <button class="header-menu-button" @click="showSettings()" ><img src="img/settings.svg" title="設定画面を表示/非表示"/></button>
+        <button class="menu-button" @click="addColumn(taskColumnList.length)"> <img src="img/plus.svg" title="カラムを追加"/></button>
+        <button class="menu-button" @click="showOutput()"> <img src="img/note-text.svg" title="出力画面を表示/非表示"/></button>
+        <button class="menu-button" @click="showSettings()" ><img src="img/settings.svg" title="設定画面を表示/非表示"/></button>
       </div>
     </div>
     <draggable
       v-model="taskColumnList"
       v-bind="dragOptions"
       group="column"
-      @start="drag=true"
-      @end="drag=false"
+      @start="onDragDropStart"
+      @end="onDragDropEnd"
       class="task-colmun-container">
       <task-column 
         v-for="(column,index) in taskColumnList"
-        v-bind:taskList="column.taskList"
+        v-bind:title="column.title"
+        v-bind:taskListProp="column.taskList"
         v-bind:index="index"
         v-bind:totalsize="taskColumnList.length"
         v-bind:key="column.id"
         :ref="index"
         @add-column="addColumn(index)"
         @delete-colmn="deleteColumn(index)"
+        @emit-item="emitItem"
         @save-item="saveItem()"
       ></task-column>
     </draggable>
@@ -60,12 +62,16 @@
     <div class="output" v-show="taskListSettings.isOutputVisible">
       <input type="button" value="出力" class="menu" @click="outputResult" title="テキストとして出力" />
       <input type="button" value="コピー" class="menu" @click="copyResult" title="出力結果をクリップボードにコピー"/>
-      <input type="button" value="✖" class="close-button" @click="showOutput" title="閉じる" />
+      <button class="close-button" @click="showOutput" title="閉じる" >
+        <img src="img/x.svg" />
+      </button>
       <br />
       <textarea class="result" v-bind:value="outputStr"></textarea>
     </div>
     <div class="settings" v-show="this.taskListSettings.isSettingsVisible">
-      <input type="button" value="✖" class="close-button"  @click="showSettings" title="閉じる" />
+      <button class="close-button" @click="showSettings" title="閉じる" >
+        <img src="img/x.svg" />
+      </button>
       <h2>設定</h2>
       <ul style="padding-left:20px;">
         <li>ヘッダ：<br />
@@ -96,7 +102,6 @@
 <script>
 import TaskColumn from "./components/TaskColumn.vue";
 import draggable from 'vuedraggable'
-
 export default {
   name: "app",
   components: {
@@ -158,6 +163,13 @@ export default {
       this.taskColumnList.splice(index, 1);
       this.saveItem();
     },
+    onDragDropStart:function(){
+      this.drag=true;
+    },
+    onDragDropEnd:function(){
+      this.drag=false;
+      this.saveItem();
+    },
     showOutput:function(){
       (this.taskListSettings.isOutputVisible)?
       this.taskListSettings.isOutputVisible=false:
@@ -173,9 +185,12 @@ export default {
     setAllItemState: function() {
       for (var item in this.$refs) {
         if (this.$refs[item]["0"] != null) {
-          this.$refs[item]["0"].setItemState();
+          this.$refs[item]["0"].setAllItemState();
         }
       }
+    },
+    emitItem:function(columnIndex,taskList){
+      this.taskColumnList[columnIndex].taskList = taskList;
     },
     saveItem: function() {
       localStorage.taskColumnList = JSON.stringify(this.taskColumnList);
@@ -211,9 +226,10 @@ export default {
       textarea.select();
       document.execCommand("copy");
     },
+
   },
   mounted() {
-    if (localStorage.taskList) {
+    if (localStorage.taskColumnList) {
       this.taskColumnList = JSON.parse(localStorage.taskColumnList);
     }
     if (localStorage.taskListOutputTemplate) {
@@ -223,12 +239,14 @@ export default {
       this.taskListSettings = JSON.parse(localStorage.taskListSettings);
     }
   },
+  /*
   updated: function() {
     this.$nextTick(function() {
       this.setAllItemState();
+      this.saveItem();
     });
-    this.saveItem();
   }
+    */
 };
 </script>
 
@@ -294,7 +312,7 @@ body{
   width: 100%;
   background: linear-gradient(to top, #ece9e6, #ffffff);
   margin: 0px 0px 0px 0px;
-  height: 60px;
+  height: 40px;
 }
 .header-menu{
   margin-right: 10px;
@@ -303,32 +321,18 @@ body{
 }
 .header-dummy{
   width:100%;
-  height:60px;
+  height:40px;
 }
-.sidebar{
-  position: fixed;
-  z-index: 998;
-  top: 60px;
-  left: 0;
 
-  width:50px;
-  height:100%;
-  background: linear-gradient(to left, #ece9e6, #ffffff);
-}
 .task-colmun-container{
   width:auto;
   height: 100%;
   display: flex;
   justify-content: flex-start;
-  align-items: stretch;
+  align-items:flex-start;
   overflow-x: scroll;
 }
-.tasks{
-  padding-top: 120px;
-  margin-bottom: 60px;
-  /*font-size: 120%;*/
-  /*font-size:16px;*/
-}
+
 .output{
   z-index: 2;
   position: absolute;
@@ -416,7 +420,7 @@ button {
 .close-button:hover{
   filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.4));
 }
-.header-menu-button{
+.menu-button{
   cursor: pointer;
   color: #49494967;
   opacity: 0.5;
@@ -424,7 +428,7 @@ button {
   transition: 0.3s;
   margin:5px;
 }
-.header-menu-button:hover {
+.menu-button:hover {
   opacity: 1.0;
   filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.4));
 

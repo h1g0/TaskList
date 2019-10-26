@@ -1,13 +1,22 @@
 <template>
   <div class="column">
-    <div class="tasks">
+    <p class="column-title"
+      v-show=" ! this.isTitleEditing"
+      @click.stop="showTitleEdit">{{title}}</p>
+    <input type="text"
+            class = "column-title"
+            v-show="this.isTitleEditing"
+            @click.stop
+            @blur="hideTitleEdit"
+            v-model="title">
+                  <hr />
       <draggable
-        v-model="taskList"
+        :list="taskList"
         v-bind="dragOptions"
         group="task"
-        handle=".handle"
-        @start="drag=true"
-        @end="drag=false"
+        @start="onDragDropStart"
+        @end="onDragDropEnd"
+        class="tasks"
       >
       <transition-group type="transition" :name="drag ? 'flip-list' : null">
         <task-item
@@ -23,9 +32,10 @@
         ></task-item>
         </transition-group>
       </draggable>
-    </div>
 
-      <button class="header-menu-button" @click="addItem"> <img src="img/plus.svg" title="タスクを追加"/></button>
+    <button class="menu-button" @click="addItem">
+      <img src="img/plus.svg" title="タスクを追加"/>
+    </button>
   </div>
 </template>
 <script>
@@ -37,7 +47,7 @@ export default {
     TaskItem,
     draggable
   },
-  props: ["taskList", "index", "totalsize"],
+  props: ["title","taskListProp", "index", "totalsize"],
   directives: {
     visible: {
       update: function(el, binding) {
@@ -47,12 +57,9 @@ export default {
   },
   data: function() {
     return {
-      indentWidth: 30,
-      isTopItem: true,
-      isBottomItem: true,
-      isDeletableItem: false,
-      isEditing: false,
-      isShowItemButtons: false,
+      taskList: this.taskListProp,
+      isTitleEditing:false,
+      drag: false,
     };
   },
   computed: {
@@ -81,9 +88,9 @@ export default {
       this.saveItem();
     },
     replaceItem: function(upperIndex, lowerIndex) {
-      var temp = this.taskList[lowerIndex];
-      this.taskList.splice(lowerIndex, 1, this.taskList[upperIndex]);
-      this.taskList.splice(upperIndex, 1, temp);
+      var temp = this.taskList().get(lowerIndex);
+      this.taskList().splice(lowerIndex, 1, this.taskList().get(upperIndex));
+      this.taskList().splice(upperIndex, 1, temp);
     },
     deleteItem: function(index) {
       if (!this.$refs[index]["0"].isDeletableItem) {
@@ -95,8 +102,28 @@ export default {
       this.taskList.splice(index, 1);
       this.saveItem();
     },
+    onDragDropStart:function(){
+      this.drag=true;
+    },
+    onDragDropEnd:function(){
+      this.drag=false;
+      this.saveItem();
+    },
     saveItem:function(){
+      this.$emit('emit-item',this.index,this.taskList);
       this.$emit('save-item');
+    },
+    showTitleEdit:function(){
+      this.isTitleEditing=true;
+      this.setFocusToTextInput();
+    },
+    hideTitleEdit:function(){
+      this.isTitleEditing=false;
+    },
+    setFocusToTextInput: function() {
+      this.$nextTick(() => {
+        this.$refs[0].input.focus();
+      });
     },
     setAllItemState: function() {
       for (var item in this.$refs) {
@@ -106,18 +133,26 @@ export default {
       }
     }
   },
+  watch:{
+    taskList:function () {
+      this.saveItem();
+    }
+  },
   updated: function() {
+    /*
     this.$nextTick(function() {
       this.setAllItemState();
+      this.saveItem();
     });
-    this.saveItem();
+    */
+
   }
 };
 </script>
 <style scoped>
 
 .column{
-  margin-top: 70px;
+  margin-top: 50px;
   margin-left:10px;
   z-index: 1;
   padding: 10px 0px 3px 0px;
@@ -126,6 +161,19 @@ export default {
   box-shadow: -8px 0px 8px 0px rgba(0,0,0,0.3), 8px 0px 8px 0px rgba(0,0,0,0.3);
   min-width: 350px;
   height: auto;
+}
+.column-title{
+  margin:5px;
+  font-size: 20px;
+  font-weight: bold;
+  height: 1em;
+  width:95%;
+}
+.tasks{
+  padding: 0px;
+  position: relative;
+  width:100%;
+  min-height: 30px;
 }
 
 </style>
