@@ -88,6 +88,9 @@ export default {
     },
     hideEditItemText: function() {
       this.isEditing = false;
+      if(this.task.text === ""){
+        this.$emit('delete-item')
+      }
     },
     showItemButtons: function() {
       this.isShowItemButtons = true;

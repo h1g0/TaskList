@@ -16,8 +16,9 @@
       :list="column.taskList"
       v-bind="dragOptions"
       group="task"
+      draggable=".task-item"
       filter=".input-text"
-      preventOnFilter=false
+      :preventOnFilter="false"
       @start="onDragDropStart"
       @end="onDragDropEnd"
       class="tasks"
@@ -36,10 +37,11 @@
         ></task-item>
         </transition-group>
       </draggable>
-
+    <div class="task-add-button-container">
     <button class="task-add-button menu-button" @click="addItem">
       <img src="img/plus.svg" title="タスクを追加"/>
     </button>
+    </div>
   </div>
 </template>
 <script>
@@ -88,10 +90,15 @@ export default {
     addItem: function() {
       this.column.taskList.splice(this.column.taskList.length, 0, this.buildNewItem());
       this.saveItem();
-      this.$refs[this.column.taskList.length - 1]["0"].showEditItemText();
+      this.$nextTick(() => {
+        this.$refs[this.column.taskList.length - 1]['0'].showEditItemText();
+      });
+
+
     },
     deleteItem: function(index) {
-      if (!window.confirm("アイテムを削除します。よろしいですか？")) {
+      if (this.column.taskList[index].text!="" &&
+       ! window.confirm("アイテムを削除します。よろしいですか？")) {
         return;
       }
       this.column.taskList.splice(index, 1);
@@ -114,6 +121,9 @@ export default {
     },
     hideTitleEdit:function(){
       this.isTitleEditing=false;
+      if(this.column.title==""){
+        this.$emit('delete-column');
+      }
     },
     setFocusToTextInput: function() {
       this.$nextTick(() => {
@@ -167,12 +177,16 @@ export default {
   height: 1em;
   width:80%;
 }
+.task-add-button-container{
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
 .task-add-button{
   padding: 0px;
   margin-left:auto;
   margin-right: auto;
   position: relative;
-  width:100%;
 }
 .tasks{
   padding: 0px;

@@ -3,7 +3,6 @@
     <div class="header">
       <h1>TaskList</h1>
       <div class="header-menu"> 
-        <button class="menu-button" @click="addColumn(taskColumnList.length)"> <img src="img/plus.svg" title="カラムを追加"/></button>
         <button class="menu-button" @click="showOutput()"> <img src="img/note-text.svg" title="出力画面を表示/非表示"/></button>
         <button class="menu-button" @click="showSettings()" ><img src="img/settings.svg" title="設定画面を表示/非表示"/></button>
       </div>
@@ -13,7 +12,7 @@
       v-bind="dragOptions"
       group="column"
       filter=".input-text"
-      preventOnFilter="false"
+      :preventOnFilter="false"
       @start="onDragDropStart"
       @end="onDragDropEnd"
       class="task-colmun-container"
@@ -26,12 +25,16 @@
         v-bind:key="column.id"
         :ref="index"
         @add-column="addColumn(index)"
-        @delete-colmn="deleteColumn(index)"
+        @delete-column="deleteColumn(index)"
         @emit-item="emitItem"
         @save-item="saveItem()"
       ></task-column>
+      <div slot="footer" class="column-dummy">
+        <button class="menu-button" style="width:100%;" @click="addColumn(taskColumnList.length)" title="カラムを追加">
+          <img src="img/plus.svg" />
+        </button>
+      </div>
     </draggable>
-
     <div class="output" v-show="taskListSettings.isOutputVisible">
       <input type="button" value="出力" class="menu" @click="outputResult" title="テキストとして出力" />
       <input type="button" value="コピー" class="menu" @click="copyResult" title="出力結果をクリップボードにコピー"/>
@@ -125,12 +128,16 @@ export default {
       };
     },
     addColumn: function(index) {
-      this.taskColumnList.splice(index + 1, 0, this.buildNewColumn());
+      this.taskColumnList.splice(index, 0, this.buildNewColumn());
       //this.taskList[index + 1].indent = this.taskList[index].indent;
       this.saveItem();
+      this.$nextTick(() => {
+        this.$refs[index]['0'].showTitleEdit();
+      });
     },
     deleteColumn: function(index) {
-      if (!window.confirm("カラムを削除します。よろしいですか？")) {
+      if (this.taskColumnList[index].title != "" &&
+          ! window.confirm("カラムを削除します。よろしいですか？")) {
         return;
       }
       this.taskColumnList.splice(index, 1);
@@ -305,7 +312,22 @@ body{
   align-items:flex-start;
   overflow-x: scroll;
 }
-
+.column-dummy{
+  margin-top: 50px;
+  margin-left:10px;
+  z-index: 1;
+  padding: 10px 0px 3px 0px;
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.2);
+  min-width: 350px;
+  height: 50px;
+  display:flex;
+  justify-content:center;
+  align-content: center;
+}
+.column-dummy:hover{
+    background-color: rgba(255, 255, 255, 0.5);
+}
 .output{
   z-index: 2;
   position: absolute;
