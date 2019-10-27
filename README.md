@@ -1,5 +1,5 @@
 # TaskList
-Browser-based Task (or ToDo) List.
+Browser-based multi-column Task (or TODO) List.  
 
 ## Screenshots
 
