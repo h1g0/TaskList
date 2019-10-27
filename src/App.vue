@@ -11,6 +11,7 @@
       v-model="taskColumnList"
       v-bind="dragOptions"
       group="column"
+      draggable=".column"
       filter=".input-text"
       :preventOnFilter="false"
       @start="onDragDropStart"
@@ -19,18 +20,18 @@
     >
       <task-column 
         v-for="(column,index) in taskColumnList"
-        v-bind:columnProp="column"
-        v-bind:index="index"
-        v-bind:totalsize="taskColumnList.length"
-        v-bind:key="column.id"
+        :columnProp="column"
+        :index="index"
+        :totalsize="taskColumnList.length"
+        :key="column.id"
         :ref="index"
         @add-column="addColumn(index)"
         @delete-column="deleteColumn(index)"
         @emit-item="emitItem"
         @save-item="saveItem()"
       ></task-column>
-      <div slot="footer" class="column-dummy">
-        <button class="menu-button" style="width:100%;" @click="addColumn(taskColumnList.length)" title="カラムを追加">
+      <div slot="footer" key="footer" class="column-dummy">
+        <button class="menu-button" style="width:100%;height:100%;" @click="addColumn(taskColumnList.length)" title="カラムを追加">
           <img src="img/plus.svg" />
         </button>
       </div>

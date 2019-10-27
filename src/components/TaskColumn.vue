@@ -1,17 +1,24 @@
 <template>
   <div class="column">
-    <p class="column-title"
-      v-show=" ! this.isTitleEditing"
-      @click.stop="showTitleEdit">{{column.title}}</p>
-    <input type="text"
-            class = "input-text column-title"
-            ref="title"
-            v-show="this.isTitleEditing"
-            @change="saveItem"
-            @blur="hideTitleEdit"
-            v-model="column.title"
-    >
-    <hr />
+    <div class="column-header" >
+      <div class="column-title" @click.stop="showTitleEdit">
+      <span class="column-title"
+        v-show=" ! this.isTitleEditing"
+        >{{column.title}}</span>
+      <input type="text"
+              class = "input-text column-title"
+              ref="title"
+              v-show="this.isTitleEditing"
+              @change="saveItem"
+              @blur="hideTitleEdit"
+              v-model="column.title"
+      >
+      </div>
+      <button class="menu-button" title = "カラムのメニューを表示">
+        <img src="img/more-vertical.svg" />
+      </button>
+    </div>
+          <hr />
     <draggable
       :list="column.taskList"
       v-bind="dragOptions"
@@ -162,20 +169,28 @@ export default {
   margin-top: 50px;
   margin-left:10px;
   z-index: 1;
-  padding: 10px 0px 3px 0px;
+  padding: 0;
   border-radius: 10px;
   background-color: #ffffff;
   box-shadow: -8px 0px 8px 0px rgba(0,0,0,0.3), 8px 0px 8px 0px rgba(0,0,0,0.3);
   min-width: 350px;
   height: auto;
 }
+.column-header{
+  margin:0;
+  padding: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width:100%;
+  height:auto;
+}
 .column-title{
-    cursor: text;
-  margin:10px;
+  cursor: text;
+  margin:5px;
   font-size: 20px;
   font-weight: bold;
-  height: 1em;
-  width:80%;
+  flex-grow: 2;
 }
 .task-add-button-container{
   display: flex;
