@@ -31,12 +31,12 @@
         @save-item="saveItem()"
       ></task-column>
       <div slot="footer" key="footer" class="column-dummy">
-        <button class="menu-button" style="width:100%;height:100%;" @click="addColumn(taskColumnList.length)" title="カラムを追加">
+        <button class="menu-button" style="width:100%;height:100%;" @click="addColumn(taskColumnList.length)" title="新規カラムを追加">
           <img src="img/plus.svg" />
         </button>
       </div>
     </draggable>
-    <div class="output" v-show="taskListSettings.isOutputVisible">
+    <div class="output" v-if="taskListSettings.isOutputVisible">
       <input type="button" value="出力" class="menu" @click="outputResult" title="テキストとして出力" />
       <input type="button" value="コピー" class="menu" @click="copyResult" title="出力結果をクリップボードにコピー"/>
       <button class="close-button" @click="showOutput" title="閉じる" >
@@ -45,7 +45,7 @@
       <br />
       <textarea class="result" v-bind:value="outputStr"></textarea>
     </div>
-    <div class="settings" v-show="this.taskListSettings.isSettingsVisible">
+    <div class="settings" v-if="this.taskListSettings.isSettingsVisible">
       <button class="close-button" @click="showSettings" title="閉じる" >
         <img src="img/x.svg" />
       </button>
@@ -53,8 +53,8 @@
       <ul style="padding-left:20px;">
         <li>ヘッダ：<br />
         <input type="text" class="settings-text" @change="saveSettings" v-model="taskListOutputTemplate.header"></li>
-        <li>インデントの文字：<br />
-        <input type="text" class="settings-text"  @change="saveSettings" v-model="taskListOutputTemplate.indentStr"></li>
+        <li>カラムのタイトル：<br />
+        <input type="text" class="settings-text"  @change="saveSettings" v-model="taskListOutputTemplate.titleStr"></li>
         <li>チェックボックス（未）：<br />
         <input type="text" class="settings-text"  @change="saveSettings" v-model="taskListOutputTemplate.uncheckedText"></li>
         <li>チェックボックス（済）：<br />
@@ -66,7 +66,7 @@
       </ul>
       <div style="border: dotted 2px #7db4e6;">
         <ul style="font-size:small">
-          <li>{IndentText}: インデントの文字</li>
+          <li>{Title}: カラムのタイトル</li>
           <li>{CheckBoxText}: チェックボックス</li>
           <li>{Text}: 本文</li>
           <li>{br}: 改行</li>
@@ -88,12 +88,12 @@ export default {
   directives: {},
   data: function() {
     return {
-      taskColumnList: [this.buildNewColumn()],
+      taskColumnList: [],
       outputStr: "",
       taskListOutputTemplate: {
         header: "## TODO{br}{br}",
-        indentStr: "  ",
-        body: "{IndentText}- {CheckBoxText} {Text}{br}",
+        titleStr: "### {Title}{br}{br}",
+        body: "- {CheckBoxText} {Text}{br}",
         footer: "",
         uncheckedText: "[ ]",
         checkedText: "[x]"
@@ -126,22 +126,24 @@ export default {
         id: this.buildId(), 
         title: "",
         taskList: [],
+        output: true,
       };
     },
     addColumn: function(index) {
       this.taskColumnList.splice(index, 0, this.buildNewColumn());
-      //this.taskList[index + 1].indent = this.taskList[index].indent;
       this.saveItem();
       this.$nextTick(() => {
+        this.$refs[index]['0'].isNewColumn=true;
         this.$refs[index]['0'].showTitleEdit();
       });
     },
     deleteColumn: function(index) {
-      if (this.taskColumnList[index].title != "" &&
+      if ( ! this.$refs[index]['0'].isNewColumn &&
           ! window.confirm("カラムを削除します。よろしいですか？")) {
         return;
       }
       this.taskColumnList.splice(index, 1);
+      this.$refs[index]['0'].isNewColumn=false;
       this.saveItem();
     },
     onDragDropStart:function(){
@@ -163,13 +165,6 @@ export default {
       this.taskListSettings.isSettingsVisible=true;
       this.saveSettings();
     },
-    setAllItemState: function() {
-      for (var item in this.$refs) {
-        if (this.$refs[item]["0"] != null) {
-          this.$refs[item]["0"].setAllItemState();
-        }
-      }
-    },
     emitItem:function(columnIndex,column){
       this.taskColumnList[columnIndex] = column;
     },
@@ -180,27 +175,42 @@ export default {
       localStorage.taskListOutputTemplate = JSON.stringify(this.taskListOutputTemplate);
       localStorage.taskListSettings = JSON.stringify(this.taskListSettings);
     },
-    replaceOutputStr: function(index, template){
-      let indentStr = "";
-      for(let i = 0; i < this.taskList[index].indent;i++){
-        indentStr += this.taskListOutputTemplate.indentStr;
-      }
-      let checkStr = this.taskList[index].checked ? 
+    replaceOutputStrHeader:function(template){
+      let result = template.replace(/\{br\}/g, "\n");
+      return result;
+    },
+    replaceOutputStrTitle:function(column,template){
+      let result = template
+        .replace(/\{Title\}/g, this.taskColumnList[column].title)
+        .replace(/\{br\}/g, "\n") ;
+      return result;
+    },
+    replaceOutputStr: function(column,index, template){
+      let checkStr = this.taskColumnList[column].taskList[index].checked ? 
         this.taskListOutputTemplate.checkedText:
         this.taskListOutputTemplate.uncheckedText;
       let lineStr = template
-        .replace(/\{IndentText\}/g, indentStr)
         .replace(/\{CheckBoxText\}/g, checkStr)
-        .replace(/\{Text\}/g, this.taskList[index].text)
-        .replace(/\{br\}/g, "\n");
+        .replace(/\{Text\}/g, this.taskColumnList[column].taskList[index].text)
+        .replace(/\{br\}/g, "\n") ;
       return lineStr;
     },
+    replaceOutputStrFooter:function(template){
+      let result = template.replace(/\{br\}/g, "\n") ;
+      return result;
+    },
     outputResult: function(){
-      this.outputStr = this.replaceOutputStr(0, this.taskListOutputTemplate.header);
-      for (let item in this.taskList) {
-        this.outputStr += this.replaceOutputStr(item, this.taskListOutputTemplate.body);
+      this.outputStr = this.replaceOutputStrHeader(this.taskListOutputTemplate.header);
+
+      for (let column in this.taskColumnList) {
+        if(this.taskColumnList[column].output){
+          this.outputStr += this.replaceOutputStrTitle(column,this.taskListOutputTemplate.titleStr);
+          for(let i in this.taskColumnList[column].taskList){
+            this.outputStr += this.replaceOutputStr(column,i, this.taskListOutputTemplate.body);
+          }
+        }
       }
-      this.outputStr += this.replaceOutputStr(0, this.taskListOutputTemplate.footer);
+      this.outputStr += this.replaceOutputStr(this.taskListOutputTemplate.footer);
     },
     copyResult: function(){
       let textarea = document.getElementsByClassName("result")[0];
@@ -330,7 +340,7 @@ body{
     background-color: rgba(255, 255, 255, 0.5);
 }
 .output{
-  z-index: 2;
+  z-index: 12;
   position: absolute;
   top: 65px;
   right:5px;
@@ -347,7 +357,7 @@ body{
   resize: vertical;
 }
 .settings{
-  z-index: 3;
+  z-index: 13;
   position: absolute;
   top: 65px;
   right:5px;

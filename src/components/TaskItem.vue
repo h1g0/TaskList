@@ -11,23 +11,24 @@
     <input type="checkbox" :id="task.id" v-model="task.checked" @change="$emit('save-item')" />
     <label :for="task.id" @click.stop="(task.checked)?task.checked=false:task.checked=true">&nbsp;</label>
     <div
-      class = "task-item-text"
-      v-show=" ! isEditing"
+      :class = "['task-item-text',this.isTextEmpty()?'task-item-text-empty':'']"
+      v-if=" ! isEditing"
       v-bind:style="{textDecoration: (task.checked)?'line-through':'none'}"
-    >{{ task.text }}</div>
+    >{{ this.getText() }}</div>
     <input
       class = "input-text task-item-text"
       type="text"
+      placeholder="タスクの内容を入力"
       ref="input"
       v-model="task.text"
-      v-show="isEditing"
+      v-if="isEditing"
       @change="$emit('save-item')"
       @blur="hideEditItemText"
-      @keyup.enter="hideEditItemText"
+      @keyup.enter="onPressEnterEditItemText"
       v-bind:style="{ textDecoration: (task.checked)?'line-through':'none'}"
       title="内容"
     />
-    <div v-show="isShowItemButtons" style="display:inline-block; position:absolute; right:0;">
+    <div v-if="isShowItemButtons" style="display:inline-block; position:absolute; right:0;">
 
       <button
         v-show="this.isDeletableItem"
@@ -61,25 +62,23 @@ export default {
       isBottomItem: true,
       isDeletableItem: true,
       isEditing: false,
-      isShowItemButtons: false
+      isShowItemButtons: false,
+      isNewItem: false,
     };
   },
   methods: {
-    setItemState: function() {
-      if (this.index == 0) {
-        this.isTopItem = true;
-      } else {
-        this.isTopItem = false;
+    isTextEmpty:function(){
+      if(this.task.text==""){
+        return true;
+      }else{
+        return false;
       }
-      if (this.index == this.totalsize - 1) {
-        this.isBottomItem = true;
-      } else {
-        this.isBottomItem = false;
-      }
-      if (this.totalsize > 1) {
-        this.isDeletableItem = true;
-      } else {
-        this.isDeletableItem = false;
+    },
+    getText:function(){
+      if(this.isTextEmpty()){
+        return "クリックして内容を入力";
+      }else{
+        return this.task.text;
       }
     },
     showEditItemText: function() {
@@ -88,8 +87,18 @@ export default {
     },
     hideEditItemText: function() {
       this.isEditing = false;
-      if(this.task.text === ""){
-        this.$emit('delete-item')
+      if(this.isNewItem){
+        if(this.isTextEmpty()){
+          this.$emit('delete-item');
+        }else{
+          this.isNewItem=false;
+        }
+      }
+    },
+    onPressEnterEditItemText:function(){
+      this.hideEditItemText();
+      if( ! this.isTextEmpty()){
+        this.$emit('add-item',this.index);
       }
     },
     showItemButtons: function() {
@@ -164,6 +173,9 @@ input[type="checkbox"]:checked + label:before {
   cursor: text;
   width:80%;
   height:1em; 
+}
+.task-item-text-empty{
+  color: rgba(0,0,0,0.3);
 }
 .handle{
   color: rgba(0,0,0,0);
