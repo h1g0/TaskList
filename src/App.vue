@@ -91,8 +91,8 @@ export default {
       taskColumnList: [],
       outputStr: "",
       taskListOutputTemplate: {
-        header: "## TODO{br}{br}",
-        titleStr: "### {Title}{br}{br}",
+        header: "## TODO{br}",
+        titleStr: "{br}### {Title}{br}{br}",
         body: "- {CheckBoxText} {Text}{br}",
         footer: "",
         uncheckedText: "[ ]",
@@ -377,6 +377,7 @@ h1 {
   text-shadow: 2px 2px 3px rgba(255,255,255,0.1);
   display: inline-block;
   padding-left:10px;
+  cursor: default;
 }
 h2 {
   font-size: 16px;

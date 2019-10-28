@@ -44,6 +44,8 @@
           @add-item="addItem(index+1)"
           @delete-item="deleteItem(index)"
           @save-item="saveItem()"
+          @up-key-on-text-edit="onPressKeyUpItemTextEdit(index)"
+          @down-key-on-text-edit="onPressKeyDownItemTextEdit(index)"
         ></task-item>
         </transition-group>
       </draggable>
@@ -128,6 +130,7 @@ export default {
       });
     },
     deleteItem: function(index) {
+      this.hideMenu();
       if (
         ! this.$refs[index]['0'].isNewItem &&
         ! window.confirm("アイテムを削除します。よろしいですか？")) {
@@ -187,6 +190,18 @@ export default {
         this.addItem(0);
       }
     },
+    onPressKeyUpItemTextEdit:function(index){
+      if(index <= 0){return;}
+      this.$nextTick(()=>{
+        this.$refs[index - 1]['0'].showEditItemText();
+      });
+    },
+    onPressKeyDownItemTextEdit:function(index){
+      if(index >= this.column.taskList.length - 1){return;}
+      this.$nextTick(()=>{
+        this.$refs[index + 1]['0'].showEditItemText();
+      });
+    },
     showMenu:function(){
       this.$nextTick(() => {
         this.isShowingMenu=true;
@@ -204,9 +219,10 @@ export default {
       this.saveItem();
     },
     deleteCheckedItem:function() {
-        if( ! window.confirm("チェック済みのタスクを全て削除します。よろしいですか？")){
-          return;
-        }
+      this.hideMenu();
+      if( ! window.confirm("チェック済みのタスクを全て削除します。よろしいですか？")){
+        return;
+      }
       for(let i in this.column.taskList){
         if(this.column.taskList[i].checked){
           this.column.taskList.splice(i, 1);
@@ -215,9 +231,10 @@ export default {
       this.saveItem();
     },
     deleteAllItem:function() {
-        if( ! window.confirm("全てのタスクを削除します。よろしいですか？")){
-          return;
-        }
+      this.hideMenu();
+      if( ! window.confirm("全てのタスクを削除します。よろしいですか？")){
+        return;
+      }
       this.column.taskList.splice(0);
       this.saveItem();
     },

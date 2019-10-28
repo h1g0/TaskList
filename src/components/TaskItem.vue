@@ -25,6 +25,8 @@
       @change="$emit('save-item')"
       @blur="hideEditItemText"
       @keyup.enter="onPressEnterEditItemText"
+      @keyup.up="$emit('up-key-on-text-edit')"
+      @keyup.down="$emit('down-key-on-text-edit')"
       v-bind:style="{ textDecoration: (task.checked)?'line-through':'none'}"
       title="内容"
     />
