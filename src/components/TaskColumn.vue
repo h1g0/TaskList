@@ -21,7 +21,7 @@
         <img src="img/more-vertical.svg" />
       </button>
     </div>
-          <hr />
+    <hr/>
     <draggable
       :list="column.taskList"
       v-bind="dragOptions"
@@ -256,7 +256,6 @@ export default {
 };
 </script>
 <style scoped>
-
 .column{
   position: relative;
   margin-top: 50px;
@@ -270,6 +269,8 @@ export default {
   height: auto;
 }
 .column-header{
+  position: sticky;
+  top:40px;
   margin:0;
   padding: 0;
   display: flex;
@@ -277,6 +278,9 @@ export default {
   align-items: flex-start;
   width:100%;
   height:auto;
+  background-color: #ffffff;
+  border-radius: 10px;
+  z-index: 2;
 }
 .column-title{
   cursor: text;
