@@ -33,7 +33,6 @@
       @end="onDragDropEnd"
       class="tasks"
       >
-      <transition-group type="transition" :name="drag ? 'flip-list' : null">
         <task-item
           v-for="(item,index) in column.taskList"
           v-bind:task="item"
@@ -47,7 +46,6 @@
           @up-key-on-text-edit="onPressKeyUpItemTextEdit(index)"
           @down-key-on-text-edit="onPressKeyDownItemTextEdit(index)"
         ></task-item>
-        </transition-group>
       </draggable>
     <div class="task-add-button-container">
       <button class="task-add-button menu-button" @click="addItem(column.taskList.length)">

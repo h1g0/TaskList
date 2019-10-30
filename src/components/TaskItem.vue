@@ -118,7 +118,6 @@ export default {
       this.task.checked = ! this.task.checked;
       this.$nextTick(()=>{
         this.$emit('save-item');
-        window.console.log('saved');
       });
     }
   }
