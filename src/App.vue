@@ -210,7 +210,7 @@ export default {
           }
         }
       }
-      this.outputStr += this.replaceOutputStr(this.taskListOutputTemplate.footer);
+      this.outputStr += this.replaceOutputStrFooter(this.taskListOutputTemplate.footer);
     },
     copyResult: function(){
       let textarea = document.getElementsByClassName("result")[0];

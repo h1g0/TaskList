@@ -8,8 +8,8 @@
     @mouseleave="hideItemButtons"
   >
   <span class="handle" v-visible="this.isShowItemButtons">⠿</span>
-    <input type="checkbox" :id="task.id" v-model="task.checked" @change="$emit('save-item')" />
-    <label :for="task.id" @click.stop="(task.checked)?task.checked=false:task.checked=true">&nbsp;</label>
+    <input type="checkbox" :id="task.id" v-model="task.checked" />
+    <label :for="task.id" @click.stop="toggleCheckBox">&nbsp;</label>
     <div
       :class = "['task-item-text',this.isTextEmpty()?'task-item-text-empty':'']"
       v-if=" ! isEditing"
@@ -112,6 +112,13 @@ export default {
     setFocusToTextInput: function() {
       this.$nextTick(() => {
         this.$refs.input.focus();
+      });
+    },
+    toggleCheckBox:function(){
+      this.task.checked = ! this.task.checked;
+      this.$nextTick(()=>{
+        this.$emit('save-item');
+        window.console.log('saved');
       });
     }
   }
