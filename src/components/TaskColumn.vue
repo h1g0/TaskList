@@ -237,22 +237,6 @@ export default {
       this.saveItem();
     },
   },
-  watch:{
-    /*
-    column:function () {
-      this.saveItem();
-    }
-    */
-  },
-  updated: function() {
-    /*
-    this.$nextTick(function() {
-      this.setAllItemState();
-      this.saveItem();
-    });
-    */
-
-  }
 };
 </script>
 <style scoped>

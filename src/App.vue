@@ -230,14 +230,6 @@ export default {
       this.taskListSettings = JSON.parse(localStorage.taskListSettings);
     }
   },
-  /*
-  updated: function() {
-    this.$nextTick(function() {
-      this.setAllItemState();
-      this.saveItem();
-    });
-  }
-    */
 };
 </script>
 
@@ -422,7 +414,7 @@ button {
   float:right;
   border:none;
   background-color: transparent;
-  color: #000;
+  color: #000000;
 }
 .close-button:hover{
   filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.4));
@@ -439,7 +431,6 @@ button {
   opacity: 1.0;
   color:green;
   filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.4));
-
 }
 
 hr {
