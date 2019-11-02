@@ -1,12 +1,25 @@
 <template>
   <div id="app">
     <div class="header">
+      <div class="header-menu"> 
+        <button class="menu-button" @click="showSidebar()">
+          <img src="img/menu.svg" title="サイドバーを表示/非表示"/>
+        </button>
+      </div>
       <h1>TaskList</h1>
       <div class="header-menu"> 
         <button class="menu-button" @click="showOutput()"> <img src="img/note-text.svg" title="出力画面を表示/非表示"/></button>
         <button class="menu-button" @click="showSettings()" ><img src="img/settings.svg" title="設定画面を表示/非表示"/></button>
       </div>
     </div>
+    <transition>
+    <div class="sidebar" v-if="taskListSettings.isSidebarVisible">
+      <div v-for = "column in taskColumnList" :key="column.id">
+        {{column.title}}
+        <hr />
+      </div>
+    </div>
+    </transition>
     <draggable
       v-model="taskColumnList"
       v-bind="dragOptions"
@@ -17,6 +30,7 @@
       @start="onDragDropStart"
       @end="onDragDropEnd"
       class="task-colmun-container"
+      v-bind:style="{marginLeft: taskListSettings.isSidebarVisible?'350px':'0px'}"
     >
       <task-column 
         v-for="(column,index) in taskColumnList"
@@ -101,6 +115,7 @@ export default {
       taskListSettings: {
         isSettingsVisible: false,
         isOutputVisible: false,
+        isSidebarVisible: true,
       },
       drag: false,
     };
@@ -152,6 +167,12 @@ export default {
     onDragDropEnd:function(){
       this.drag=false;
       this.saveItem();
+    },
+    showSidebar:function(){
+      (this.taskListSettings.isSidebarVisible)?
+      this.taskListSettings.isSidebarVisible=false:
+      this.taskListSettings.isSidebarVisible=true;
+      this.saveSettings();
     },
     showOutput:function(){
       (this.taskListSettings.isOutputVisible)?
@@ -241,16 +262,12 @@ export default {
   animation-timing-function: ease;
   transition: opacity 0.3s, transform 0.3s;
 }
-.v-leave-active {
-  position: absolute;
-}
+
 .v-enter {
-  opacity: 0;
-  transform: translateX(-64px);
+  transform: translateX(-350px);
 }
 .v-leave-to {
-  opacity: 0;
-  transform: translateX(64px);
+  transform: translateX(-350px);
 }
 
 .flip-list-move {
@@ -306,9 +323,21 @@ body{
   width:100%;
   height:40px;
 }
+.sidebar{
+  position: fixed;
+  z-index: 998;
+  top: 40px;
+  left: 0;
+  width:330px;
+  padding: 10px;
+  height:100%;
+  background: linear-gradient(to left, #ece9e6, #ffffff);
+  box-shadow: -8px 0px 8px 0px rgba(0,0,0,0.3), 8px 0px 8px 0px rgba(0,0,0,0.3);
 
+}
 .task-colmun-container{
   width:auto;
+  margin-left:350px;
   height: 100%;
   display: flex;
   justify-content: flex-start;
