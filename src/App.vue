@@ -14,10 +14,17 @@
     </div>
     <transition>
     <div class="sidebar" v-if="taskListSettings.isSidebarVisible">
-      <div v-for = "column in taskColumnList" :key="column.id">
-        {{column.title}}
-        <hr />
+      <a href = "#" v-for = "column in taskColumnList" :key="column.id" class="sidebar-content" v-scroll-to="'#column-' + column.id">
+        <div class="sidebar-content">
+         {{column.title}}
+          <hr />
+        </div>
+      </a>
+      <a href="#" v-scroll-to="'#new-button'" @click="addColumn(taskColumnList.length)" title="新規カラムを追加">
+      <div class="menu-button sidebar-content">
+        <img src="img/plus.svg">
       </div>
+      </a>
     </div>
     </transition>
     <draggable
@@ -29,7 +36,7 @@
       :preventOnFilter="false"
       @start="onDragDropStart"
       @end="onDragDropEnd"
-      class="task-colmun-container"
+      class="column-container"
       v-bind:style="{marginLeft: taskListSettings.isSidebarVisible?'350px':'0px'}"
     >
       <task-column 
@@ -38,13 +45,14 @@
         :index="index"
         :totalsize="taskColumnList.length"
         :key="column.id"
+        :id="'column-' + column.id"
         :ref="index"
         @add-column="addColumn(index)"
         @delete-column="deleteColumn(index)"
         @emit-item="emitItem"
         @save-item="saveItem()"
       ></task-column>
-      <div slot="footer" key="footer" class="column-dummy">
+      <div slot="footer" key="footer" class="column-dummy" id="new-button">
         <button class="menu-button" style="width:100%;height:100%;" @click="addColumn(taskColumnList.length)" title="新規カラムを追加">
           <img src="img/plus.svg" />
         </button>
@@ -92,12 +100,13 @@
 
 <script>
 import TaskColumn from "./components/TaskColumn.vue";
-import draggable from 'vuedraggable'
+import draggable from 'vuedraggable';
+
 export default {
   name: "app",
   components: {
     TaskColumn,
-    draggable
+    draggable,
   },
   directives: {},
   data: function() {
@@ -333,9 +342,18 @@ body{
   height:100%;
   background: linear-gradient(to left, #ece9e6, #ffffff);
   box-shadow: -8px 0px 8px 0px rgba(0,0,0,0.3), 8px 0px 8px 0px rgba(0,0,0,0.3);
-
 }
-.task-colmun-container{
+.sidebar-content{
+  text-decoration: none;
+  color: #000000;
+  border-radius: 5px;
+}
+.sidebar-content:hover{
+  text-decoration: none;
+  color: #000000;
+  background: rgba(0, 0, 0, 0.3);
+}
+.column-container{
   width:auto;
   margin-left:350px;
   height: 100%;
@@ -424,7 +442,7 @@ button {
 }
 .menu {
   display: inline-block;
-  border-radius: 5%;
+  border-radius: 5px;
   font-size: 11pt;
   text-align: center;
   cursor: pointer;

@@ -269,6 +269,7 @@ hr{
   border-radius: 10px;
   z-index: 2;
 }
+
 .column-title{
   cursor: text;
   margin:5px;

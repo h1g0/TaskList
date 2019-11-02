@@ -11,6 +11,7 @@
     "core-js": "^2.6.5",
     "v-click-outside": "^2.1.4",
     "vue": "^2.6.10",
+    "vue-scrollto": "^2.17.1",
     "vuedraggable": "^2.23.2"
   },
   "devDependencies": {
