@@ -181,6 +181,7 @@ input[type="checkbox"]:checked + label:before {
   cursor: text;
   width:80%;
   height:1em; 
+  font-size:14px;
 }
 .task-item-text-empty{
   color: rgba(0,0,0,0.3);

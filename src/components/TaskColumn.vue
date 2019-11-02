@@ -240,6 +240,9 @@ export default {
 };
 </script>
 <style scoped>
+hr{
+  margin-top:0px;
+}
 .column{
   position: relative;
   margin-top: 50px;
@@ -269,7 +272,7 @@ export default {
 .column-title{
   cursor: text;
   margin:5px;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: bold;
   flex-grow: 2;
 }
