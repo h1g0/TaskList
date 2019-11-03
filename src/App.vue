@@ -383,7 +383,7 @@ body{
   position: absolute;
   top: 65px;
   right:5px;
-  width: 500px;
+  width: 350px;
   height: auto;
   padding: 10px;
   background-color: #ffffff;
