@@ -28,6 +28,8 @@
       group="task"
       draggable=".task-item"
       filter=".input-text"
+      forceFallback="true"
+      scrollSensitivity="100"
       :preventOnFilter="false"
       @start="onDragDropStart"
       @end="onDragDropEnd"
